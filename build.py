@@ -118,7 +118,40 @@ def main() -> None:
     patch(src / 'lib' / 'onlyoffice' / 'ui-theme.ts', [
         ("export const DEFAULT_UI_THEME = 'theme-classic-light';", "export const DEFAULT_UI_THEME = 'theme-white';"),
     ])
+    # Local history (recent files): the document bytes of every snapshot are kept encrypted at rest (AES-GCM 256,
+    # non-extractable key in this origin's IndexedDB), as InkDOS keeps its recovery drafts (patches/history-seal.ts).
+    # Snapshots stored before stay readable. Upstream's history tests and ours run before the build.
+    shutil.copy2(ROOT / 'patches' / 'history-seal.ts', src / 'lib' / 'history' / 'seal.ts')
+    shutil.copy2(ROOT / 'patches' / 'history-seal.test.ts', src / 'test' / 'unit' / 'history-seal.test.ts')
+    patch(src / 'lib' / 'history' / 'types.ts', [
+        ("  bytes: Uint8Array;\n  byteLength: number;\n}",
+         "  bytes: Uint8Array;\n  byteLength: number;\n"
+         "  /** InkDOS: `bytes` is IV + AES-GCM ciphertext (lib/history/seal.ts); byteLength stays the document's size. */\n"
+         "  sealed?: boolean;\n}"),
+    ])
+    patch(src / 'lib' / 'history' / 'store.ts', [
+        ("import type { HistoryDoc, HistoryOrigin, HistorySnapshot } from './types';",
+         "import type { HistoryDoc, HistoryOrigin, HistorySnapshot } from './types';\n"
+         "import { openHistoryBytes, sealHistoryBytes } from './seal';"),
+        ("async function writeSnapshot(payload: Uint8Array, input: SnapshotInput, budget: number): Promise<HistoryDoc | null> {\n"
+         "  const byteLength = payload.byteLength;",
+         "async function writeSnapshot(\n  payload: Uint8Array,\n  input: SnapshotInput,\n  budget: number,\n  sealed = false,\n"
+         "  byteLength = payload.byteLength,\n): Promise<HistoryDoc | null> {"),
+        ("const snapshot: HistorySnapshot = { docId: doc.id, rev, savedAt: now, bytes: payload, byteLength };",
+         "const snapshot: HistorySnapshot = { docId: doc.id, rev, savedAt: now, bytes: payload, byteLength, ...(sealed ? { sealed } : {}) };"),
+        ("  const payload = await toBytes(input.bytes);\n  try {\n    return await writeSnapshot(payload, input, budget);",
+         "  const plain = await toBytes(input.bytes);\n"
+         "  // InkDOS: encrypted before the transaction (an await on anything but IndexedDB would end it)\n"
+         "  const { bytes: payload, sealed } = await sealHistoryBytes(plain);\n"
+         "  try {\n    return await writeSnapshot(payload, input, budget, sealed, plain.byteLength);"),
+        ("    try {\n      return await writeSnapshot(payload, input, budget);\n    } catch {",
+         "    try {\n      return await writeSnapshot(payload, input, budget, sealed, plain.byteLength);\n    } catch {"),
+        ("        return rows.sort((a, b) => b.rev - a.rev)[0];\n      })) ?? null",
+         "        return rows.sort((a, b) => b.rev - a.rev)[0];\n      }).then((row) => (row ? openHistoryBytes(row) : null))) ?? null"),
+    ])
     run([*pnpm, 'install', '--frozen-lockfile'], src)
+    run([*pnpm, 'exec', 'vitest', 'run', 'test/unit/history-seal.test.ts', 'test/unit/history-store.test.ts',
+         'test/unit/history-recovery.test.ts'], src)
     run([*pnpm, 'run', 'build'], src)
     if out.exists():
         shutil.rmtree(out)
