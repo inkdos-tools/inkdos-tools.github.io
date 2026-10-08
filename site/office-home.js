@@ -65,7 +65,12 @@
     pt: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) com o editor completo.', spreadsheets: 'Planilhas Excel (XLSX, XLS, ODS, CSV) com fórmulas e gráficos.',
       presentations: 'Apresentações PowerPoint (PPTX, PPT, ODP) com o editor completo.', open: 'Abrir', new: 'Novo', edit: 'Editar',
       note: 'Documentos, Planilhas e Apresentações baixam cerca de 100 MB na primeira vez. Os arquivos nunca saem deste aparelho.',
-      powered: 'Powered by', recent: 'Arquivos recentes', source: 'Código-fonte' },
+      powered: 'Powered by', recent: 'Arquivos recentes', source: 'Código-fonte',
+      engine: 'Motor', light: 'Versão light', full: 'Versão completa',
+      engineNote: 'Editores ONLYOFFICE para Word, Excel e PowerPoint. Versão light: os editores do InkDOS, mais leves.',
+      pdfTools: 'Ferramentas de PDF', terminal: 'Terminal', offline: 'Ferramentas offline', offlineTitle: 'Ferramentas neste aparelho',
+      offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
+      close: 'Fechar', downloadAll: 'Baixar tudo' },
     es: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) con el editor completo.', spreadsheets: 'Hojas de Excel (XLSX, XLS, ODS, CSV) con fórmulas y gráficos.',
       presentations: 'Presentaciones PowerPoint (PPTX, PPT, ODP) con el editor completo.', open: 'Abrir', new: 'Nuevo', edit: 'Editar',
       note: 'Documentos, Hojas de cálculo y Presentaciones descargan unos 100 MB la primera vez. Los archivos nunca salen de este dispositivo.',
@@ -107,6 +112,16 @@
       el.setAttribute(attr, url.pathname + url.search);
     });
   }
+  // the tools keep the InkDOS appearance (?inkdos-theme=, as from the InkDOS Home)
+  function toolLinks() {
+    document.querySelectorAll('a[data-tool-link]').forEach(function (a) {
+      var url = new URL(a.getAttribute('href'), location.href);
+      url.searchParams.set('inkdos-theme', root.dataset.theme === 'dark' ? 'dark' : 'light');
+      a.setAttribute('href', url.pathname + url.search);
+    });
+  }
+  new MutationObserver(toolLinks).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  toolLinks();
   new MutationObserver(localize).observe(root, { attributes: true, attributeFilter: ['lang'] });
   localize();
 
