@@ -34,6 +34,10 @@ It lives at the root of the origin because the upstream build uses root-absolute
 5. The Home is InkDOS Office's own (`site/`), in place of the upstream landing page, with "Powered by
    ONLYOFFICE" at the bottom. The editor's light
    theme is the flat white one (`theme-white`) instead of the classic coloured header.
+6. The local history (recent files, kept 7 days) stores each document encrypted at rest: AES-GCM with a
+   256-bit non-extractable key in this origin's IndexedDB, as InkDOS keeps its recovery drafts
+   (`patches/history-seal.ts`, applied to `lib/history/` with its test; older unencrypted snapshots stay
+   readable).
 
 ## Branches
 
