@@ -33,21 +33,26 @@
     apply();
   })();
 
-  // Open on the InkDOS workspaces (PDF, Plain Text, EPUB): the file picked here is handed to the workspace the way
-  // the InkDOS Home does (IndexedDB 'inkdos-launch-handoff', then #inkdos-launch=<id>), so it opens directly
-  function handoff(file, app) {
+  // Open on the reader tools (PDF.js viewer, CodeMirror, foliate-js; InkDOS-tools, same origin): the file picked here
+  // is stored in IndexedDB 'inkdos-tools-handoff' and the tool page takes it (viewers/file-handoff.js, #inkdos-file=<id>)
+  function handoff(file, page) {
+    var go = function (id) {
+      var url = new URL(page, location.href);
+      url.searchParams.set('inkdos-theme', root.dataset.theme === 'dark' ? 'dark' : 'light');
+      location.assign(url.pathname + url.search + (id ? '#inkdos-file=' + id : ''));
+    };
     file.arrayBuffer().then(function (data) {
-      var req = indexedDB.open('inkdos-launch-handoff', 1);
+      var req = indexedDB.open('inkdos-tools-handoff', 1);
       req.onupgradeneeded = function () { req.result.createObjectStore('files'); };
       req.onsuccess = function () {
         var db = req.result, id = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
         var tx = db.transaction('files', 'readwrite'), store = tx.objectStore('files');
         store.clear();
         store.put({ name: file.name, type: file.type, lastModified: file.lastModified, data: data }, id);
-        tx.oncomplete = function () { db.close(); location.assign('./apps/' + app + '/index.html?suite=1#inkdos-launch=' + id); };
-        tx.onabort = tx.onerror = function () { db.close(); location.assign('./apps/' + app + '/index.html?suite=1'); };
+        tx.oncomplete = function () { db.close(); go(id); };
+        tx.onabort = tx.onerror = function () { db.close(); go(''); };
       };
-      req.onerror = function () { location.assign('./apps/' + app + '/index.html?suite=1'); };
+      req.onerror = function () { go(''); };
     });
   }
   var picker = document.createElement('input');
@@ -70,7 +75,10 @@
       engineNote: 'Editores ONLYOFFICE para Word, Excel e PowerPoint. Versão light: os editores do InkDOS, mais leves.',
       pdfTools: 'Ferramentas de PDF', terminal: 'Terminal', offline: 'Ferramentas offline', offlineTitle: 'Ferramentas neste aparelho',
       offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
-      close: 'Fechar', downloadAll: 'Baixar tudo' },
+      close: 'Fechar', downloadAll: 'Baixar tudo',
+      pdfCard: 'Ler, anotar, assinar e preencher PDFs (visualizador PDF.js).',
+      txtCard: 'Criar e editar texto, Markdown, JSON e YAML (CodeMirror).',
+      epubCard: 'Ler livros EPUB, MOBI, FB2 e CBZ (foliate-js).' },
     es: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) con el editor completo.', spreadsheets: 'Hojas de Excel (XLSX, XLS, ODS, CSV) con fórmulas y gráficos.',
       presentations: 'Presentaciones PowerPoint (PPTX, PPT, ODP) con el editor completo.', open: 'Abrir', new: 'Nuevo', edit: 'Editar',
       note: 'Documentos, Hojas de cálculo y Presentaciones descargan unos 100 MB la primera vez. Los archivos nunca salen de este dispositivo.',
