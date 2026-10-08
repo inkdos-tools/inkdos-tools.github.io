@@ -11,7 +11,8 @@
 .powered img{height:14px;width:auto;filter:grayscale(1);opacity:.5}
 html[data-theme="dark"] .powered img{filter:grayscale(1) invert(1);opacity:.65}
 /* engine switch: Full is this Home; Light goes back to the InkDOS Home (?engine=light) */
-.engine-segment a.engine-light{height:32px;padding:0 14px;border-radius:9px;color:var(--muted);font:600 13px/32px inherit;font-family:inherit;text-decoration:none}
+.engine-segment a.engine-light,.engine-segment button{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;line-height:1;text-decoration:none}
+.engine-segment a.engine-light{color:var(--muted)}
 .engine-segment a.engine-light:hover{color:var(--text)}
 .quick-tool{text-decoration:none}
 /* Offline tools (office-offline.js) */
