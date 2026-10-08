@@ -46,6 +46,6 @@ It lives at the root of the origin because the upstream build uses root-absolute
 
 ## Licences
 
-The glue (build script, workflow, `site/`) is MIT, and so are the InkDOS workspaces (`INKDOS-LICENSE.txt`). ranuts/document is AGPL-3.0 (`UPSTREAM-LICENSE.txt` and
+This repository (build script, patches to the editor, workflow, `site/`) is AGPL-3.0, the licence of the editor it builds (`LICENSE`). The InkDOS workspaces it copies in stay MIT (`INKDOS-LICENSE.txt`). ranuts/document is AGPL-3.0 (`UPSTREAM-LICENSE.txt` and
 `UPSTREAM-SOURCE.txt` in the site name the licence and the exact source); it includes the OnlyOffice
 editors (AGPL-3.0) and the fonts listed by the upstream project.
