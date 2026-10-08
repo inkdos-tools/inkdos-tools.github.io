@@ -1,12 +1,16 @@
-# InkDOS full office suite (beta)
+# InkDOS Office
 
-[ranuts/document](https://github.com/ranuts/document) — the OnlyOffice document, spreadsheet and
-presentation editors running entirely in the browser — built for [InkDOS](https://github.com/vfydr2m9wk-ops/InkDOS)
-and served at <https://inkdos-tools.github.io/>. InkDOS opens it from the **Full office (beta)** button on its
-Home. Files are opened and converted on the device (WebAssembly) and never uploaded.
+InkDOS Office is the InkDOS suite with OnlyOffice in place of InkDOS's own Word, Excel and PowerPoint editors,
+served at <https://inkdos-tools.github.io/>. Its Home (`site/`) has the six InkDOS workspaces in the InkDOS look:
 
-It is a beta: it is heavy (about 50 MB of code and a 42 MB converter on first use) and may not run on
-phones or iPads with little memory. InkDOS's own editors stay the main way to work.
+- **Documents, Spreadsheets, Presentations**: the OnlyOffice editors of
+  [ranuts/document](https://github.com/ranuts/document) (OnlyOffice running entirely in the browser: files are
+  opened, edited and converted on the device and never uploaded), with Open and New directly on the Home.
+- **PDF Workspace, Plain Text, EPUB Reader**: the InkDOS workspaces themselves, taken unchanged from the InkDOS
+  commit pinned in `office.json` (with `shared/`, `labs/pdf/` and the Home look they use).
+
+The editors are heavy (about 100 MB the first time) and may not open on devices with little memory.
+InkDOS (<https://vfydr2m9wk-ops.github.io/InkDOS/>) stays the light, offline edition.
 
 ## Origin
 
@@ -27,8 +31,8 @@ It lives at the root of the origin because the upstream build uses root-absolute
 3. Every page gets a Content-Security-Policy that allows no connection to another site
    (`connect-src 'self' data: blob:`), so the optional AI assistants of the editor cannot send anything out.
 4. Cloudflare host files (`_headers`, `_redirects`) are left out.
-5. The start page is InkDOS's own (`site/`): open a file or start a Word, Excel or PowerPoint document
-   directly, in the InkDOS look and language; the upstream landing page is replaced. The editor's light
+5. The Home is InkDOS Office's own (`site/`), in place of the upstream landing page, with "Powered by
+   ONLYOFFICE" at the bottom. The editor's light
    theme is the flat white one (`theme-white`) instead of the classic coloured header.
 
 ## Branches
@@ -38,6 +42,6 @@ It lives at the root of the origin because the upstream build uses root-absolute
 
 ## Licences
 
-The glue (build script, workflow) is MIT. ranuts/document is AGPL-3.0 (`UPSTREAM-LICENSE.txt` and
+The glue (build script, workflow, `site/`) is MIT, and so are the InkDOS workspaces (`INKDOS-LICENSE.txt`). ranuts/document is AGPL-3.0 (`UPSTREAM-LICENSE.txt` and
 `UPSTREAM-SOURCE.txt` in the site name the licence and the exact source); it includes the OnlyOffice
 editors (AGPL-3.0) and the fonts listed by the upstream project.

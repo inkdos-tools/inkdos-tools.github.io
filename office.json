@@ -1,10 +1,23 @@
 {
   "name": "ranuts/document",
-  "title": "Full office suite (beta)",
+  "title": "InkDOS Office",
   "description": "Word, Excel and PowerPoint files opened and edited with the OnlyOffice editors running in the browser (beta, heavy).",
   "repo": "https://github.com/ranuts/document",
   "ref": "9c743826d0152239dc7ad51677535d59679c7ff1",
   "license": "AGPL-3.0",
   "license_file": "LICENSE",
-  "pnpm": "11.4.0"
+  "pnpm": "11.4.0",
+  "inkdos": {
+    "repo": "https://github.com/vfydr2m9wk-ops/InkDOS",
+    "ref": "9c419c8d80e9f25303fc4cc0df223e44a147f51f",
+    "paths": [
+      "apps/pdf",
+      "apps/txt",
+      "apps/epub",
+      "labs/pdf",
+      "shared",
+      "assets/home.css",
+      "assets/icons"
+    ]
+  }
 }

@@ -30,17 +30,17 @@ def run(cmd: list[str], cwd: Path, env: dict | None = None) -> None:
     subprocess.run(cmd, cwd=cwd, check=True, env={**os.environ, **(env or {})})
 
 
-def fetch(work: Path) -> Path:
-    src = work / 'document'
+def fetch(work: Path, name: str = 'document', repo: str = TOOL['repo'], ref: str = TOOL['ref']) -> Path:
+    src = work / name
     if (src / '.git').exists():
         head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=src, capture_output=True, text=True).stdout.strip()
-        if head == TOOL['ref']:
+        if head == ref:
             return src
         shutil.rmtree(src)
     src.mkdir(parents=True)
     run(['git', 'init', '-q'], src)
-    run(['git', 'remote', 'add', 'origin', TOOL['repo']], src)
-    run(['git', 'fetch', '-q', '--depth', '1', 'origin', TOOL['ref']], src)
+    run(['git', 'remote', 'add', 'origin', repo], src)
+    run(['git', 'fetch', '-q', '--depth', '1', 'origin', ref], src)
     run(['git', 'checkout', '-q', 'FETCH_HEAD'], src)
     return src
 
@@ -123,7 +123,18 @@ def main() -> None:
     if out.exists():
         shutil.rmtree(out)
     shutil.copytree(src / 'dist', out)
-    # InkDOS start page (site/) in place of the upstream landing page: open a file or start a document directly
+    # InkDOS Office Home (site/) in place of the upstream landing page, with the InkDOS PDF, Plain Text and EPUB
+    # workspaces (and what they load: shared/, labs/pdf/, the Home look) from the InkDOS commit pinned in office.json
+    inkdos = TOOL['inkdos']
+    ink = fetch(work, 'inkdos', inkdos['repo'], inkdos['ref'])
+    for rel in inkdos['paths']:
+        source, target = ink / rel, out / rel
+        if source.is_dir():
+            shutil.copytree(source, target, dirs_exist_ok=True)
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+    shutil.copy2(ink / 'LICENSE', out / 'INKDOS-LICENSE.txt')
     for item in (ROOT / 'site').iterdir():
         shutil.copy2(item, out / item.name)
     apply_patches(out)

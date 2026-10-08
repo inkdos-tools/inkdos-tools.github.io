@@ -1,0 +1,12 @@
+/* InkDOS Office Home: the InkDOS Home (assets/home.css) plus Open / New on the three OnlyOffice workspaces */
+.office-card{padding-right:24px}
+.office-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.office-action{height:34px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);display:inline-flex;align-items:center;font-weight:600;font-size:13px;line-height:1;font-family:inherit;text-decoration:none;cursor:pointer}
+.office-action:hover{background:var(--menu-active,rgba(0,0,0,.05))}
+.office-action.primary{background:color-mix(in srgb,var(--accent) 12%,var(--card));border-color:color-mix(in srgb,var(--accent) 35%,var(--border));color:color-mix(in srgb,var(--accent) 85%,var(--text))}
+.office-action:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 32%,transparent);outline-offset:2px}
+.office-note{margin:18px 2px 0;color:var(--muted);font-size:12.5px;line-height:1.45}
+.office-footer{flex-wrap:wrap;row-gap:12px}
+.powered{display:inline-flex;align-items:center;gap:7px;color:var(--footer);font-size:11.5px}
+.powered img{height:14px;width:auto;filter:grayscale(1);opacity:.5}
+html[data-theme="dark"] .powered img{filter:grayscale(1) invert(1);opacity:.65}
