@@ -109,4 +109,8 @@
   }
   new MutationObserver(localize).observe(root, { attributes: true, attributeFilter: ['lang'] });
   localize();
+
+  // The service worker keeps each editor on this device after its first use; ask the browser not to clear that
+  // copy (and the recent files) under storage pressure, so the editors keep opening with no network.
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (_) {}
 })();
