@@ -1,0 +1,10 @@
+{
+  "name": "ranuts/document",
+  "title": "Full office suite (beta)",
+  "description": "Word, Excel and PowerPoint files opened and edited with the OnlyOffice editors running in the browser (beta, heavy).",
+  "repo": "https://github.com/ranuts/document",
+  "ref": "9c743826d0152239dc7ad51677535d59679c7ff1",
+  "license": "AGPL-3.0",
+  "license_file": "LICENSE",
+  "pnpm": "11.4.0"
+}
