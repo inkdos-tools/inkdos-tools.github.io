@@ -33,34 +33,61 @@
     apply();
   })();
 
+  // Open on the InkDOS workspaces (PDF, Plain Text, EPUB): the file picked here is handed to the workspace the way
+  // the InkDOS Home does (IndexedDB 'inkdos-launch-handoff', then #inkdos-launch=<id>), so it opens directly
+  function handoff(file, app) {
+    file.arrayBuffer().then(function (data) {
+      var req = indexedDB.open('inkdos-launch-handoff', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('files'); };
+      req.onsuccess = function () {
+        var db = req.result, id = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+        var tx = db.transaction('files', 'readwrite'), store = tx.objectStore('files');
+        store.clear();
+        store.put({ name: file.name, type: file.type, lastModified: file.lastModified, data: data }, id);
+        tx.oncomplete = function () { db.close(); location.assign('./apps/' + app + '/index.html?suite=1#inkdos-launch=' + id); };
+        tx.onabort = tx.onerror = function () { db.close(); location.assign('./apps/' + app + '/index.html?suite=1'); };
+      };
+      req.onerror = function () { location.assign('./apps/' + app + '/index.html?suite=1'); };
+    });
+  }
+  var picker = document.createElement('input');
+  picker.type = 'file'; picker.hidden = true; document.body.appendChild(picker);
+  var pickFor = null;
+  picker.addEventListener('change', function () { var file = picker.files && picker.files[0]; if (file && pickFor) handoff(file, pickFor); });
+  document.querySelectorAll('[data-launch-app]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      pickFor = button.dataset.launchApp; picker.accept = button.dataset.launchAccept || ''; picker.value = ''; picker.click();
+    });
+  });
+
   var T = {
     en: {},
     pt: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) com o editor completo.', spreadsheets: 'Planilhas Excel (XLSX, XLS, ODS, CSV) com fórmulas e gráficos.',
-      presentations: 'Apresentações PowerPoint (PPTX, PPT, ODP) com o editor completo.', open: 'Abrir', new: 'Novo',
+      presentations: 'Apresentações PowerPoint (PPTX, PPT, ODP) com o editor completo.', open: 'Abrir', new: 'Novo', edit: 'Editar',
       note: 'Documentos, Planilhas e Apresentações baixam cerca de 100 MB na primeira vez. Os arquivos nunca saem deste aparelho.',
       powered: 'Powered by', recent: 'Arquivos recentes', source: 'Código-fonte' },
     es: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) con el editor completo.', spreadsheets: 'Hojas de Excel (XLSX, XLS, ODS, CSV) con fórmulas y gráficos.',
-      presentations: 'Presentaciones PowerPoint (PPTX, PPT, ODP) con el editor completo.', open: 'Abrir', new: 'Nuevo',
+      presentations: 'Presentaciones PowerPoint (PPTX, PPT, ODP) con el editor completo.', open: 'Abrir', new: 'Nuevo', edit: 'Editar',
       note: 'Documentos, Hojas de cálculo y Presentaciones descargan unos 100 MB la primera vez. Los archivos nunca salen de este dispositivo.',
       recent: 'Archivos recientes', source: 'Código fuente' },
     fr: { documents: 'Documents Word (DOCX, DOC, ODT, RTF) avec l’éditeur complet.', spreadsheets: 'Classeurs Excel (XLSX, XLS, ODS, CSV) avec formules et graphiques.',
-      presentations: 'Présentations PowerPoint (PPTX, PPT, ODP) avec l’éditeur complet.', open: 'Ouvrir', new: 'Nouveau',
+      presentations: 'Présentations PowerPoint (PPTX, PPT, ODP) avec l’éditeur complet.', open: 'Ouvrir', new: 'Nouveau', edit: 'Modifier',
       note: 'Documents, Tableurs et Présentations téléchargent environ 100 Mo la première fois. Les fichiers ne quittent jamais cet appareil.',
       recent: 'Fichiers récents', source: 'Code source' },
     de: { documents: 'Word-Dokumente (DOCX, DOC, ODT, RTF) mit dem vollständigen Editor.', spreadsheets: 'Excel-Arbeitsmappen (XLSX, XLS, ODS, CSV) mit Formeln und Diagrammen.',
-      presentations: 'PowerPoint-Präsentationen (PPTX, PPT, ODP) mit dem vollständigen Editor.', open: 'Öffnen', new: 'Neu',
+      presentations: 'PowerPoint-Präsentationen (PPTX, PPT, ODP) mit dem vollständigen Editor.', open: 'Öffnen', new: 'Neu', edit: 'Bearbeiten',
       note: 'Dokumente, Tabellen und Präsentationen laden beim ersten Mal etwa 100 MB. Dateien verlassen dieses Gerät nie.',
       recent: 'Zuletzt verwendet', source: 'Quellcode' },
     ja: { documents: '完全なエディターで Word 文書（DOCX、DOC、ODT、RTF）を編集。', spreadsheets: '数式とグラフ付きの Excel ブック（XLSX、XLS、ODS、CSV）。',
-      presentations: '完全なエディターで PowerPoint（PPTX、PPT、ODP）を編集。', open: '開く', new: '新規',
+      presentations: '完全なエディターで PowerPoint（PPTX、PPT、ODP）を編集。', open: '開く', new: '新規', edit: '編集',
       note: '文書・スプレッドシート・プレゼンテーションは初回に約 100 MB をダウンロードします。ファイルがこのデバイスの外に出ることはありません。',
       recent: '最近のファイル', source: 'ソースコード' },
     ru: { documents: 'Документы Word (DOCX, DOC, ODT, RTF) в полном редакторе.', spreadsheets: 'Книги Excel (XLSX, XLS, ODS, CSV) с формулами и диаграммами.',
-      presentations: 'Презентации PowerPoint (PPTX, PPT, ODP) в полном редакторе.', open: 'Открыть', new: 'Создать',
+      presentations: 'Презентации PowerPoint (PPTX, PPT, ODP) в полном редакторе.', open: 'Открыть', new: 'Создать', edit: 'Изменить',
       note: 'Документы, Таблицы и Презентации в первый раз загружают около 100 МБ. Файлы никогда не покидают это устройство.',
       recent: 'Недавние файлы', source: 'Исходный код' },
     zh: { documents: '用完整编辑器处理 Word 文档（DOCX、DOC、ODT、RTF）。', spreadsheets: '带公式和图表的 Excel 工作簿（XLSX、XLS、ODS、CSV）。',
-      presentations: '用完整编辑器处理 PowerPoint 演示文稿（PPTX、PPT、ODP）。', open: '打开', new: '新建',
+      presentations: '用完整编辑器处理 PowerPoint 演示文稿（PPTX、PPT、ODP）。', open: '打开', new: '新建', edit: '编辑',
       note: '文档、表格和演示文稿首次使用时需下载约 100 MB。文件绝不会离开本设备。',
       recent: '最近的文件', source: '源代码' }
   };

@@ -1,4 +1,4 @@
-/* InkDOS Office Home: the InkDOS Home (assets/home.css) plus Open / New on the three OnlyOffice workspaces */
+/* InkDOS Office Home: the InkDOS Home (assets/home.css) plus Open / New / Edit on every workspace card */
 .office-card{padding-right:24px}
 .office-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .office-action{height:34px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);display:inline-flex;align-items:center;font-weight:600;font-size:13px;line-height:1;font-family:inherit;text-decoration:none;cursor:pointer}
