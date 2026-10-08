@@ -34,10 +34,10 @@ It lives at the root of the origin because the upstream build uses root-absolute
 5. The Home is InkDOS Office's own (`site/`), in place of the upstream landing page, with "Powered by
    ONLYOFFICE" at the bottom. The editor's light
    theme is the flat white one (`theme-white`) instead of the classic coloured header.
-6. The local history (recent files, kept 7 days) stores each document encrypted at rest: AES-GCM with a
-   256-bit non-extractable key in this origin's IndexedDB, as InkDOS keeps its recovery drafts
-   (`patches/history-seal.ts`, applied to `lib/history/` with its test; older unencrypted snapshots stay
-   readable).
+6. No recent files: the editor's local history is turned off (`lib/history/autosave.ts` always reports it
+   disabled), the Home has no Recent files link and removes a history stored before, once per device. Files are
+   found again with the device's own file manager. Should it ever be turned back on, its snapshots are encrypted at
+   rest (AES-GCM, non-extractable key; `patches/history-seal.ts`).
 
 ## Branches
 

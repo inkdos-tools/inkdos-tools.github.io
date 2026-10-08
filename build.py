@@ -118,6 +118,12 @@ def main() -> None:
     patch(src / 'lib' / 'onlyoffice' / 'ui-theme.ts', [
         ("export const DEFAULT_UI_THEME = 'theme-classic-light';", "export const DEFAULT_UI_THEME = 'theme-white';"),
     ])
+    # InkDOS keeps no list of recent files: the device's own file manager is where files are found again. The editor's
+    # automatic snapshots into its local history are turned off for everyone (the setting is ignored).
+    patch(src / 'lib' / 'history' / 'autosave.ts', [
+        ("  return localStorageGetItem(AUTOSAVE_PREF_KEY) !== 'false';",
+         "  return false; // InkDOS: no local history of the user's documents"),
+    ])
     # Local history (recent files): the document bytes of every snapshot are kept encrypted at rest (AES-GCM 256,
     # non-extractable key in this origin's IndexedDB), as InkDOS keeps its recovery drafts (patches/history-seal.ts).
     # Snapshots stored before stay readable. Upstream's history tests and ours run before the build.

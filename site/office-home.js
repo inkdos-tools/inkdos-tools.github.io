@@ -133,6 +133,16 @@
   new MutationObserver(localize).observe(root, { attributes: true, attributeFilter: ['lang'] });
   localize();
 
+  // InkDOS keeps no recent files: remove the editor's local history (snapshots of documents, encrypted, and its key)
+  // stored before this was turned off. Once per device.
+  try {
+    if (localStorage.getItem('inkdos-office:history-removed') !== '1' && window.indexedDB) {
+      indexedDB.deleteDatabase('document-history');
+      indexedDB.deleteDatabase('document-history-key');
+      localStorage.setItem('inkdos-office:history-removed', '1');
+    }
+  } catch (_) {}
+
   // The service worker keeps each editor on this device after its first use; ask the browser not to clear that
   // copy (and the recent files) under storage pressure, so the editors keep opening with no network.
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (_) {}
