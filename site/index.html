@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Full office — InkDOS</title>
+<link rel="icon" href="inkdos-office.svg">
+<link rel="stylesheet" href="inkdos-launcher.css">
+<script src="inkdos-launcher.js"></script>
+<script src="open-local.js" defer></script>
+</head>
+<body>
+<main class="shell">
+  <p class="credit" data-t="credit">Complete editor based on OnlyOffice (ranuts/document, AGPL-3.0) · beta</p>
+  <header class="brand">
+    <img class="mark" src="inkdos-office.svg" alt="">
+    <div><h1 data-t="title">Full office</h1><p data-t="subtitle">Word, Excel and PowerPoint with the full editor. Files stay on this device.</p></div>
+  </header>
+  <section class="actions" aria-label="Start">
+    <button type="button" class="action open" data-open-local="/editor?open=local"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7h6l2 2h9v9.5A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M3.5 10h17"/></svg></span><span class="copy"><strong data-t="open">Open a file</strong><small data-t="openHint">DOCX, XLSX, PPTX, DOC, XLS, PPT, CSV or PDF</small></span></button>
+    <a class="action word" href="/editor?new=docx"><span class="icon">W</span><span class="copy"><strong data-t="word">New document</strong><small>Word</small></span></a>
+    <a class="action excel" href="/editor?new=xlsx"><span class="icon">X</span><span class="copy"><strong data-t="excel">New spreadsheet</strong><small>Excel</small></span></a>
+    <a class="action powerpoint" href="/editor?new=pptx"><span class="icon">P</span><span class="copy"><strong data-t="powerpoint">New presentation</strong><small>PowerPoint</small></span></a>
+  </section>
+  <p class="note" data-t="note">Heavy: the first time it downloads about 100 MB, and it may not open on phones or iPads with little memory.</p>
+  <footer><a href="/history" data-t="recent">Recent files</a><a href="https://vfydr2m9wk-ops.github.io/InkDOS/" data-t="back">Back to InkDOS</a><a href="https://github.com/inkdos-tools/inkdos-tools.github.io" data-t="source">Source</a></footer>
+</main>
+</body>
+</html>

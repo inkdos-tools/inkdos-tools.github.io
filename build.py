@@ -114,11 +114,18 @@ def main() -> None:
     work.mkdir(parents=True, exist_ok=True)
     src = fetch(work)
     pnpm = ['npx', '-y', f"pnpm@{TOOL['pnpm']}"]
+    # InkDOS look: the editor's light chrome is the flat white theme instead of the classic coloured header
+    patch(src / 'lib' / 'onlyoffice' / 'ui-theme.ts', [
+        ("export const DEFAULT_UI_THEME = 'theme-classic-light';", "export const DEFAULT_UI_THEME = 'theme-white';"),
+    ])
     run([*pnpm, 'install', '--frozen-lockfile'], src)
     run([*pnpm, 'run', 'build'], src)
     if out.exists():
         shutil.rmtree(out)
     shutil.copytree(src / 'dist', out)
+    # InkDOS start page (site/) in place of the upstream landing page: open a file or start a document directly
+    for item in (ROOT / 'site').iterdir():
+        shutil.copy2(item, out / item.name)
     apply_patches(out)
     shutil.copy2(src / TOOL['license_file'], out / 'UPSTREAM-LICENSE.txt')
     (out / 'UPSTREAM-SOURCE.txt').write_text(

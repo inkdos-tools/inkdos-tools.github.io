@@ -27,6 +27,9 @@ It lives at the root of the origin because the upstream build uses root-absolute
 3. Every page gets a Content-Security-Policy that allows no connection to another site
    (`connect-src 'self' data: blob:`), so the optional AI assistants of the editor cannot send anything out.
 4. Cloudflare host files (`_headers`, `_redirects`) are left out.
+5. The start page is InkDOS's own (`site/`): open a file or start a Word, Excel or PowerPoint document
+   directly, in the InkDOS look and language; the upstream landing page is replaced. The editor's light
+   theme is the flat white one (`theme-white`) instead of the classic coloured header.
 
 ## Branches
 
