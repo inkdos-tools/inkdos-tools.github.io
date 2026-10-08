@@ -15,12 +15,12 @@
 
   var T = {
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
-      pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)', python: 'Python terminal and packages',
+      pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)', python: 'Python terminal and packages', epub: 'EPUB reader (foliate-js)', txt: 'Plain text editor (CodeMirror)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
       get: 'Download', again: 'Update', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
-      pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)', python: 'Terminal Python e pacotes',
+      pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)', python: 'Terminal Python e pacotes', epub: 'Leitor de EPUB (foliate-js)', txt: 'Editor de texto (CodeMirror)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
       get: 'Baixar', again: 'Atualizar', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
       busy: 'Baixando', ofs: ' de ' }
@@ -36,7 +36,9 @@
   var LISTS = [
     { id: 'pdf', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'pdf' },
     { id: 'office', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'office' },
-    { id: 'python', list: '/InkDOS-tools/python/inkdos-offline.json' }
+    { id: 'python', list: '/InkDOS-tools/python/inkdos-offline.json' },
+    { id: 'epub', list: '/InkDOS-tools/epub/inkdos-offline.json' },
+    { id: 'txt', list: '/InkDOS-tools/txt/inkdos-offline.json' }
   ];
   var items = EDITORS.map(function (e) { return { id: e.id, kind: 'editor', editor: e }; })
     .concat(LISTS.map(function (l) { return { id: l.id, kind: 'list', source: l }; }));
