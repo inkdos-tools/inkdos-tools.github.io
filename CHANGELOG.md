@@ -2,6 +2,10 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-09 · Offline tools from the InkDOS Home
+
+- `?offline=1` opens the Offline tools panel: the InkDOS Home's download button links here.
+
 ## 2026-10-09 · Home back to the plain workspace cards; Cloudflare paused
 
 - Home: each workspace is a single card that opens its InkDOS app (Documents, Spreadsheets, Presentations, PDF,

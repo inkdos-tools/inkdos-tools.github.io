@@ -357,6 +357,8 @@
       : Promise.resolve();
     updates.catch(function () {}).then(function () { location.href = './check-update'; });
   });
+  // the InkDOS Home's download button opens this panel (?offline=1)
+  if (/[?&]offline=1/.test(location.search)) open();
   if (/[?&]warm=1/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
     if (!keeps) { open(); warm(true); }
