@@ -4,8 +4,9 @@ keep the editors and tools: GitHub Pages tells browsers to recheck every file af
 without service workers (XeOS on iPad) means hundreds of requests on every open. Cloudflare Pages takes a _headers
 file, so the files that never change in place are kept by the browser for long.
 
-- Cloudflare Pages refuses files over 25 MiB: those are left out (the LibreOffice Office-to-PDF converter of the PDF
-  toolkit; ONLYOFFICE saves as PDF itself) and dropped from the Offline tools list.
+- Cloudflare Pages refuses files over 25 MiB (ONLYOFFICE's x2t.wasm, the LibreOffice converter of the PDF toolkit):
+  they are left out of the upload and served at the same address by a Pages Function that fetches them from
+  GitHub Pages (functions/[[path]].js, run only for those paths through _routes.json), with the same long cache.
 - _headers: hashed build files for a year (immutable); the vendored editor and tool files for a week, refreshed in
   the background for a month after that; pages keep Cloudflare's default (always rechecked), so updates arrive."""
 from __future__ import annotations
@@ -35,21 +36,29 @@ HEADERS = {
 }
 
 
-def main(site: Path) -> None:
-    removed = []
+FUNCTION = """// Files over the Cloudflare Pages size limit, served from GitHub Pages at this same address (scripts/cloudflare_prepare.py)
+export async function onRequest({ request }) {
+  const url = new URL(request.url);
+  const upstream = await fetch('https://inkdos-tools.github.io' + url.pathname, { cf: { cacheEverything: true, cacheTtl: 604800 } });
+  const headers = new Headers(upstream.headers);
+  headers.set('Cache-Control', '""" + WEEK + """');
+  return new Response(upstream.body, { status: upstream.status, headers });
+}
+"""
+
+
+def main(site: Path, functions: Path) -> None:
+    proxied = []
     for path in sorted(site.rglob('*')):
         if path.is_file() and path.stat().st_size > LIMIT:
-            removed.append('/' + path.relative_to(site).as_posix())
+            proxied.append('/' + path.relative_to(site).as_posix())
             path.unlink()
-    for url in removed:
-        print(f'left out (over 25 MiB): {url}')
-    if removed and not all('/libreoffice-wasm/' in url for url in removed):
-        sys.exit('a file other than the LibreOffice converter is over 25 MiB; Cloudflare Pages would not serve it')
-    listing = site / 'InkDOS-tools' / 'bentopdf' / 'inkdos-offline.json'
-    if listing.is_file() and removed:
-        data = json.loads(listing.read_text(encoding='utf-8'))
-        data['files'] = [f for f in data['files'] if f.get('group') != 'office']
-        listing.write_text(json.dumps(data, separators=(',', ':')), encoding='utf-8')
+    for url in proxied:
+        print(f'served from GitHub Pages (over 25 MiB): {url}')
+    if proxied:
+        functions.mkdir(parents=True, exist_ok=True)
+        (functions / '[[path]].js').write_text(FUNCTION, encoding='utf-8')
+        (site / '_routes.json').write_text(json.dumps({'version': 1, 'include': proxied, 'exclude': []}), encoding='utf-8')
     (site / '_headers').write_text(''.join(f'{route}\n  Cache-Control: {value}\n' for route, value in HEADERS.items()),
                                    encoding='utf-8')
     count = sum(1 for p in site.rglob('*') if p.is_file())
@@ -59,4 +68,4 @@ def main(site: Path) -> None:
 
 
 if __name__ == '__main__':
-    main(Path(sys.argv[1]))
+    main(Path(sys.argv[1]), Path(sys.argv[2]))
