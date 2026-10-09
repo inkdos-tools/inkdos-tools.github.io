@@ -11,3 +11,4 @@ Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 - Cloudflare Pages (https://inkdos-offic.pages.dev): paused. The address and project stay; it shows a notice
   pointing here (`cloudflare/paused/`). `scripts/cloudflare_prepare.py` and the deploy steps are kept for later
   (`CLOUDFLARE_MIRROR: 'on'` in the workflow publishes the full site again).
+- InkDOS apps copied here follow InkDOS main (c83042d), which opens ONLYOFFICE and BentoPDF from this address again.
