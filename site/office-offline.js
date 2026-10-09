@@ -339,7 +339,7 @@
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !dialog.hidden) close(); });
   all.addEventListener('click', function () { if (keeps) download(items); else warm(false); });
   // Check for updates: the browser keeps this site's program files for a long time (Cloudflare cache headers, see
-  // scripts/cloudflare_prepare.py). The offline copies are asked to update, then update.html (never cached) fetches
+  // scripts/cloudflare_prepare.py). The offline copies are asked to update, then check-update.html (never cached) fetches
   // this page and its scripts again past the cache and comes back here (?warm=1: without a service worker, every tool
   // is fetched again too).
   // Asked in the panel, not with confirm(): web views such as XeOS may not show browser dialogs. First tap shows the
@@ -355,7 +355,7 @@
     var updates = navigator.serviceWorker && navigator.serviceWorker.getRegistrations
       ? navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.update().catch(function () {}); })); })
       : Promise.resolve();
-    updates.catch(function () {}).then(function () { location.href = './update.html'; });
+    updates.catch(function () {}).then(function () { location.href = './check-update'; });
   });
   if (/[?&]warm=1/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
