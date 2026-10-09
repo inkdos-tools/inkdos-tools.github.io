@@ -15,13 +15,13 @@
 
   var T = {
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
-      apps: 'PDF, Plain Text and EPUB apps (InkDOS)', pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
+      apps: 'InkDOS apps (documents, spreadsheets, presentations, PDF, text, EPUB)', pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
       get: 'Download', again: 'Update', updKeep: 'Look for a new version now? The tools you downloaded stay on this device; only what changed is fetched.', updLoad: 'This browser cannot keep tools offline, so they live in its ordinary cache. This clears that cache and downloads every tool again into it (a few hundred MB; keep this page open). Look for a new version now?', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker). Download all puts every tool in its ordinary cache for up to a year, so they open from this device; the system can still clear that cache when space runs low.',
       warming: 'Saving to the cache: ', warmed: 'Done: the tools are in this browser\'s cache.', warmFail: ' files could not be saved; try again online.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
-      apps: 'Apps de PDF, Texto e EPUB (InkDOS)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
+      apps: 'Apps do InkDOS (documentos, planilhas, apresentações, PDF, texto, EPUB)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
       get: 'Baixar', again: 'Atualizar', updKeep: 'Buscar a versão mais nova agora? As ferramentas baixadas continuam neste aparelho; só o que mudou é baixado.', updLoad: 'Este navegador não guarda as ferramentas offline, então elas ficam no cache comum dele. Isto limpa esse cache e baixa todas as ferramentas de novo para ele (algumas centenas de MB; mantenha esta página aberta). Buscar a versão mais nova agora?', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não guarda as ferramentas offline (sem service worker). Baixar tudo coloca todas as ferramentas no cache comum dele por até 1 ano, para abrirem deste aparelho; o sistema ainda pode limpar esse cache se faltar espaço.',
       warming: 'Guardando no cache: ', warmed: 'Pronto: as ferramentas estão no cache deste navegador.', warmFail: ' arquivos não foram guardados; tente de novo com internet.',
