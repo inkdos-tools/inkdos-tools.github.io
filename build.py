@@ -80,6 +80,17 @@ def offline_inkdos_apps(out: Path) -> None:
 
 
 def apply_patches(out: Path) -> None:
+    # 0. Inside the editor frames: mouse-wheel scrolling on iPad, and the header logo kept but no longer a link out
+    #    of InkDOS (site/editor-inkdos.js, copied to the root with the Home)
+    frames = 0
+    for page in out.glob('web-apps/apps/*/main/index*.html'):
+        text = page.read_text(encoding='utf-8', errors='surrogateescape')
+        tag = '<script src="/editor-inkdos.js"></script>'
+        if tag not in text and '</head>' in text:
+            page.write_text(text.replace('</head>', tag + '</head>', 1), encoding='utf-8', errors='surrogateescape')
+            frames += 1
+    if not frames:
+        sys.exit('no editor frame page found for site/editor-inkdos.js')
     # 1. The x2t converter is shipped brotli-compressed under x2t.wasm.br and needs the server to declare
     #    Content-Encoding: br, which GitHub Pages cannot send: ship it decompressed as x2t.wasm instead.
     br = out / 'sdkjs' / 'common' / 'wasm' / 'x2t' / 'x2t.wasm.br'
@@ -149,6 +160,13 @@ def main() -> None:
     # Local history (recent files): the document bytes of every snapshot are kept encrypted at rest (AES-GCM 256,
     # non-extractable key in this origin's IndexedDB), as InkDOS keeps its recovery drafts (patches/history-seal.ts).
     # Snapshots stored before stay readable. Upstream's history tests and ours run before the build.
+    # Home button in the editor header (ONLYOFFICE "goback", left of Save): back to the InkDOS Office Home, in the same
+    # window. Not when the editor is framed by an InkDOS workspace (the overlay has its own way back).
+    patch(src / 'lib' / 'onlyoffice-editor.ts', [
+        ("        hideRightMenu: true,\n",
+         "        hideRightMenu: true,\n"
+         "        ...(window.top === window.self ? { goback: { url: window.location.origin + '/', blank: false, text: 'InkDOS Office' } } : {}),\n"),
+    ])
     shutil.copy2(ROOT / 'patches' / 'history-seal.ts', src / 'lib' / 'history' / 'seal.ts')
     shutil.copy2(ROOT / 'patches' / 'history-seal.test.ts', src / 'test' / 'unit' / 'history-seal.test.ts')
     patch(src / 'lib' / 'history' / 'types.ts', [
