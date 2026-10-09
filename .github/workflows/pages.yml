@@ -49,7 +49,7 @@ jobs:
           rm -rf _tools/.git
           mkdir -p _site/InkDOS-tools
           cp -a _tools/. _site/InkDOS-tools/
-          python scripts/cloudflare_prepare.py _site
+          python scripts/cloudflare_prepare.py _site functions
       - name: Deploy to Cloudflare Pages
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: npx --yes wrangler@3 pages deploy _site --project-name=inkdos-offic --branch=main --commit-dirty=true
