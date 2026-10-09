@@ -33,7 +33,7 @@
     apply();
   })();
 
-  // Open on the reader tools (PDF.js viewer, CodeMirror; InkDOS-tools, same origin): the file picked here
+  // Open on the reader tools (PDF.js viewer; InkDOS-tools, same origin): the file picked here
   // is stored in IndexedDB 'inkdos-tools-handoff' and the tool page takes it (viewers/file-handoff.js, #inkdos-file=<id>)
   // The InkDOS workspaces copied here (./apps/<app>/, the EPUB reader) take it the way the InkDOS Home hands it over:
   // IndexedDB 'inkdos-launch-handoff' and #inkdos-launch=<id> (their runtime/platform/file-launch.js).
@@ -80,7 +80,7 @@
       offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
       close: 'Fechar', downloadAll: 'Baixar tudo', checkUpdates: 'Buscar atualizações',
       pdfCard: 'Ler, anotar, assinar e preencher PDFs (visualizador PDF.js).',
-      txtCard: 'Criar e editar texto, Markdown, JSON e YAML (CodeMirror).',
+      txtCard: 'Crie e edite arquivos de texto localmente.',
       epubCard: 'Leia livros EPUB com navegação, temas e anotações.' },
     es: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) con el editor completo.', spreadsheets: 'Hojas de Excel (XLSX, XLS, ODS, CSV) con fórmulas y gráficos.',
       presentations: 'Presentaciones PowerPoint (PPTX, PPT, ODP) con el editor completo.', open: 'Abrir', new: 'Nuevo', edit: 'Editar',
