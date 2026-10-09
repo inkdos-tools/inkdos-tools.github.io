@@ -58,10 +58,10 @@ def patch(file: Path, edits: list[tuple[str, str]]) -> None:
     file.write_text(text, encoding='utf-8')
 
 
-# The InkDOS PDF, Plain Text and EPUB apps copied here, for Download all on the Home (site/office-offline.js): their
+# The InkDOS apps copied here (files opened from the system land in them first), for Download all on the Home (site/office-offline.js): their
 # files go into a cache of their own, which the editor's worker answers from (it looks in every cache). The Home opens
 # them with ?suite=1&inkdos-theme=light|dark, so the pages are listed with those addresses too.
-INKDOS_OFFLINE_PATHS = ('apps/pdf', 'apps/txt', 'apps/epub', 'shared', 'assets/home.css', 'assets/icons')
+INKDOS_OFFLINE_PATHS = ('apps/documents', 'apps/spreadsheets', 'apps/presentations', 'apps/pdf', 'apps/txt', 'apps/epub', 'shared', 'assets/home.css', 'assets/icons')
 
 
 def offline_inkdos_apps(out: Path) -> None:
@@ -71,7 +71,7 @@ def offline_inkdos_apps(out: Path) -> None:
         for path in sorted([base] if base.is_file() else base.rglob('*')):
             if path.is_file():
                 files.append({'url': '/' + path.relative_to(out).as_posix(), 'size': path.stat().st_size})
-    for app in ('pdf', 'txt', 'epub'):
+    for app in ('documents', 'spreadsheets', 'presentations', 'pdf', 'txt', 'epub'):
         for theme in ('light', 'dark'):
             files.append({'url': f'/apps/{app}/index.html?suite=1&inkdos-theme={theme}', 'size': 0})
     stamp = hashlib.sha256(json.dumps(files).encode()).hexdigest()[:12]
