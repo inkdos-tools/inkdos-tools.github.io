@@ -277,11 +277,13 @@
     opener.setAttribute('aria-expanded', 'true');
     render();
     if (!('serviceWorker' in navigator) || !window.caches) {
+      // this browser cannot keep tools (no service worker, e.g. XeOS): no list or Download all, only the notice and
+      // Check for updates (which clears the browser's ordinary cache)
       warn.textContent = t('nosw');
       warn.hidden = false;
-      all.disabled = true;
-      dialog.querySelectorAll('.offline-row button').forEach(function (b) { b.disabled = true; });
-      items.forEach(function (item) { rows[item.id].querySelector('.offline-state').textContent = t('none'); });
+      list.hidden = true;
+      all.hidden = true;
+      dialog.querySelector('[data-offline-close]').focus();
       return;
     }
     refresh();
