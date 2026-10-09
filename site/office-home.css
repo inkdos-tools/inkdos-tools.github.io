@@ -36,3 +36,4 @@ html[data-theme="dark"] .offline-row[data-state=done] .offline-state{color:#4ade
 .offline-row[hidden]{display:none}
 .offline-foot .offline-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .offline-list[hidden],.offline-foot [hidden]{display:none}
+.home-actions{display:inline-flex;align-items:center;gap:8px}
