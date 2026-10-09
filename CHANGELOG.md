@@ -2,6 +2,12 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-09 · Redirect loop with an old cached InkDOS
+
+- The Home's redirect goes to `https://vfydr2m9wk-ops.github.io/InkDOS/?engine=light`: an older InkDOS Home still
+  cached on a device (with the Light/Full switch set to Full) sent visitors back here, a loop that kept it from
+  updating; `?engine=light` makes that old Home stay, so the new version installs.
+
 ## 2026-10-09 · Engine only: no Home, no copies of the InkDOS apps
 
 - Owner decision: everything goes through the main InkDOS repository and site. This site is now only the engine
