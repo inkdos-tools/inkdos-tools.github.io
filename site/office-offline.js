@@ -328,7 +328,19 @@
     refresh();
     dialog.querySelector('[data-offline-close]').focus();
   }
+  // Embedded by the InkDOS Home (?embed=1, its download button): only this panel shows, and Close asks the Home to
+  // remove the frame (posted to the InkDOS origin only).
+  var INKDOS = 'https://vfydr2m9wk-ops.github.io';
+  var embed = /[?&]embed=1/.test(location.search) && window.parent !== window;
+  if (embed) root.classList.add('offline-embed');
+  function embedQuery() {
+    var q = new URLSearchParams(location.search), out = new URLSearchParams({ embed: '1', offline: '1' });
+    if (q.get('inkdos-theme')) out.set('inkdos-theme', q.get('inkdos-theme'));
+    if (q.get('lang')) out.set('lang', q.get('lang'));
+    return out.toString();
+  }
   function close() {
+    if (embed) { try { window.parent.postMessage({ type: 'inkdos-offline-close' }, INKDOS); } catch (_) {} return; }
     dialog.hidden = true;
     opener.setAttribute('aria-expanded', 'false');
     opener.focus();
@@ -355,7 +367,7 @@
     var updates = navigator.serviceWorker && navigator.serviceWorker.getRegistrations
       ? navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.update().catch(function () {}); })); })
       : Promise.resolve();
-    updates.catch(function () {}).then(function () { location.href = './check-update'; });
+    updates.catch(function () {}).then(function () { location.href = './check-update' + (embed ? '?' + embedQuery() : ''); });
   });
   // the InkDOS Home's download button opens this panel (?offline=1)
   if (/[?&]offline=1/.test(location.search)) open();

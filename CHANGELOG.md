@@ -4,7 +4,9 @@ Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
 ## 2026-10-09 · Offline tools from the InkDOS Home
 
-- `?offline=1` opens the Offline tools panel: the InkDOS Home's download button links here.
+- `?offline=1` opens the Offline tools panel. With `&embed=1` (the InkDOS Home's download button frames it) only the
+  panel shows, on a transparent page; Close asks the InkDOS Home to remove the frame; Check for updates comes back
+  to the embedded panel.
 
 ## 2026-10-09 · Home back to the plain workspace cards; Cloudflare paused
 
