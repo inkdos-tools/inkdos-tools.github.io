@@ -79,7 +79,7 @@
       pdfTools: 'Ferramentas de PDF', terminal: 'Terminal', offline: 'Ferramentas offline', offlineTitle: 'Ferramentas neste aparelho',
       offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
       close: 'Fechar', downloadAll: 'Baixar tudo', checkUpdates: 'Buscar atualizações',
-      pdfCard: 'Ler, anotar, assinar e preencher PDFs (visualizador PDF.js).',
+      pdfCard: 'Leia, preencha, destaque e anote PDFs localmente.',
       txtCard: 'Crie e edite arquivos de texto localmente.',
       epubCard: 'Leia livros EPUB com navegação, temas e anotações.' },
     es: { documents: 'Documentos Word (DOCX, DOC, ODT, RTF) con el editor completo.', spreadsheets: 'Hojas de Excel (XLSX, XLS, ODS, CSV) con fórmulas y gráficos.',
