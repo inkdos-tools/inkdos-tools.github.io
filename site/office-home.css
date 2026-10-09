@@ -37,3 +37,4 @@ html[data-theme="dark"] .offline-row[data-state=done] .offline-state{color:#4ade
 .offline-panel button:disabled{opacity:.5;cursor:default}
 .offline-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
 .offline-foot small{color:var(--muted);font-size:12px}
+.offline-row[hidden]{display:none}

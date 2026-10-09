@@ -19,6 +19,9 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -37,3 +40,16 @@ jobs:
           publish_branch: main
           force_orphan: true  # one commit per deploy, so old builds do not pile up in history
           commit_message: Deploy full office suite (beta)
+      # Same site on Cloudflare Pages, together with the InkDOS-tools pages it uses (same address), so browsers
+      # can keep the files for long (scripts/cloudflare_prepare.py). Skipped until the two secrets exist.
+      - name: Add the InkDOS-tools pages
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          git clone -q --depth 1 --branch gh-pages https://github.com/inkdos-tools/InkDOS-tools _tools
+          rm -rf _tools/.git
+          mkdir -p _site/InkDOS-tools
+          cp -a _tools/. _site/InkDOS-tools/
+          python scripts/cloudflare_prepare.py _site
+      - name: Deploy to Cloudflare Pages
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npx --yes wrangler@3 pages deploy _site --project-name=inkdos-offic --branch=main --commit-dirty=true
