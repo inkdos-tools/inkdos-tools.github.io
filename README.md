@@ -1,7 +1,7 @@
 # InkDOS Office
 
 InkDOS Office is the InkDOS suite with OnlyOffice in place of InkDOS's own Word, Excel and PowerPoint editors,
-served at <https://inkdos-tools.github.io/>. Its Home (`site/`) has the six InkDOS workspaces in the InkDOS look:
+served at <https://inkdos-offic.pages.dev> (main address; mirror at <https://inkdos-tools.github.io/>). Its Home (`site/`) has the six InkDOS workspaces in the InkDOS look:
 
 - **Documents, Spreadsheets, Presentations**: the OnlyOffice editors of
   [ranuts/document](https://github.com/ranuts/document) (OnlyOffice running entirely in the browser: files are
