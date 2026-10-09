@@ -58,6 +58,7 @@
       req.onerror = function () { go(''); };
     });
   }
+  window.InkDOSOfficeHome = Object.freeze({ handoff: handoff });
   var picker = document.createElement('input');
   picker.type = 'file'; picker.hidden = true; document.body.appendChild(picker);
   var pickFor = null;

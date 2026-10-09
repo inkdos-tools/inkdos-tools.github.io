@@ -1,0 +1,63 @@
+{
+  "name": "InkDOS Office",
+  "short_name": "InkDOS Office",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/img/64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-new"
+  },
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/octet-stream": [
+          ".docx",
+          ".doc",
+          ".docm",
+          ".dotx",
+          ".dot",
+          ".odt",
+          ".fodt",
+          ".rtf",
+          ".xlsx",
+          ".xls",
+          ".xlsm",
+          ".xltx",
+          ".ods",
+          ".fods",
+          ".csv",
+          ".pptx",
+          ".ppt",
+          ".pptm",
+          ".ppsx",
+          ".pps",
+          ".potx",
+          ".odp",
+          ".fodp",
+          ".pdf",
+          ".epub",
+          ".txt",
+          ".md",
+          ".json",
+          ".xml",
+          ".yaml",
+          ".yml",
+          ".log",
+          ".pages",
+          ".numbers",
+          ".key"
+        ]
+      }
+    }
+  ]
+}
