@@ -27,7 +27,8 @@ html[data-theme="dark"] .powered img{filter:grayscale(1) invert(1);opacity:.65}
 .offline-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"name button" "state button";column-gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .offline-name{grid-area:name;font-weight:600;font-size:14px}
 .offline-state{grid-area:state;color:var(--muted);font-size:12.5px}
-.offline-row button{grid-area:button}
+.offline-actions{grid-area:button;display:flex;gap:6px}
+.offline-actions [hidden]{display:none}
 .offline-row[data-state=done] .offline-state{color:#15803d}
 .offline-row[data-state=done] .offline-state::before{content:"\2713  "}
 .offline-row[data-state=failed] .offline-state{color:#b91c1c}

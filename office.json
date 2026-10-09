@@ -9,7 +9,7 @@
   "pnpm": "11.4.0",
   "inkdos": {
     "repo": "https://github.com/vfydr2m9wk-ops/InkDOS",
-    "ref": "9c7b7b141295822c3e93813048d6836e9b5faa05",
+    "ref": "01d1e647193f93090c2bd7a7caf08e9a60816142",
     "paths": [
       "apps/pdf",
       "apps/txt",
