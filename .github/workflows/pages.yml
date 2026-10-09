@@ -22,6 +22,7 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_MIRROR: paused
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -41,9 +42,11 @@ jobs:
           force_orphan: true  # one commit per deploy, so old builds do not pile up in history
           commit_message: Deploy full office suite (beta)
       # Same site on Cloudflare Pages, together with the InkDOS-tools pages it uses (same address), so browsers
-      # can keep the files for long (scripts/cloudflare_prepare.py). Skipped until the two secrets exist.
+      # can keep the files for long (scripts/cloudflare_prepare.py). Paused (owner request): the address keeps a
+      # notice page (cloudflare/paused/) until the suite is settled on GitHub Pages; set CLOUDFLARE_MIRROR to 'on'
+      # to publish the full site there again.
       - name: Add the InkDOS-tools pages
-        if: env.CLOUDFLARE_API_TOKEN != ''
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_MIRROR == 'on'
         run: |
           git clone -q --depth 1 --branch gh-pages https://github.com/inkdos-tools/InkDOS-tools _tools
           rm -rf _tools/.git
@@ -51,5 +54,8 @@ jobs:
           cp -a _tools/. _site/InkDOS-tools/
           python scripts/cloudflare_prepare.py _site functions
       - name: Deploy to Cloudflare Pages
-        if: env.CLOUDFLARE_API_TOKEN != ''
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_MIRROR == 'on'
         run: npx --yes wrangler@3 pages deploy _site --project-name=inkdos-offic --branch=main --commit-dirty=true
+      - name: Deploy the pause notice to Cloudflare Pages
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_MIRROR != 'on'
+        run: npx --yes wrangler@3 pages deploy cloudflare/paused --project-name=inkdos-offic --branch=main --commit-dirty=true
