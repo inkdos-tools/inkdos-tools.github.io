@@ -19,13 +19,13 @@
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
       get: 'Download', again: 'Update', updKeep: 'Look for a new version now? The tools you downloaded stay on this device; only what changed is fetched.', updLoad: 'This browser cannot keep tools offline, so they live in its ordinary cache. This clears that cache and downloads every tool again into it (a few hundred MB; keep this page open). Look for a new version now?', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker). Download all puts every tool in its ordinary cache for up to a year, so they open from this device; the system can still clear that cache when space runs low.',
       warming: 'Saving to the cache: ', warmed: 'Done: the tools are in this browser\'s cache.', warmFail: ' files could not be saved; try again online.',
-      busy: 'Downloading', ofs: ' of ' },
+      busy: 'Downloading', ofs: ' of ', tapAgain: 'Tap Check for updates again to continue.' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
       apps: 'Apps do InkDOS (documentos, planilhas, apresentações, PDF, texto, EPUB)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
       get: 'Baixar', again: 'Atualizar', updKeep: 'Buscar a versão mais nova agora? As ferramentas baixadas continuam neste aparelho; só o que mudou é baixado.', updLoad: 'Este navegador não guarda as ferramentas offline, então elas ficam no cache comum dele. Isto limpa esse cache e baixa todas as ferramentas de novo para ele (algumas centenas de MB; mantenha esta página aberta). Buscar a versão mais nova agora?', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não guarda as ferramentas offline (sem service worker). Baixar tudo coloca todas as ferramentas no cache comum dele por até 1 ano, para abrirem deste aparelho; o sistema ainda pode limpar esse cache se faltar espaço.',
       warming: 'Guardando no cache: ', warmed: 'Pronto: as ferramentas estão no cache deste navegador.', warmFail: ' arquivos não foram guardados; tente de novo com internet.',
-      busy: 'Baixando', ofs: ' de ' }
+      busy: 'Baixando', ofs: ' de ', tapAgain: 'Toque em Buscar atualizações de novo para continuar.' }
   };
   var t = function (key) { var code = (root.lang || 'en').toLowerCase().split('-')[0]; return (T[code] || T.en)[key] || T.en[key]; };
   var mb = function (bytes) { return bytes >= 1e9 ? (bytes / 1e9).toFixed(1) + ' GB' : Math.max(1, Math.round(bytes / 1e6)) + ' MB'; };
@@ -279,7 +279,7 @@
   // No service worker (XeOS): Download all, and Check for updates on its way back (?warm=1), load every tool into the
   // browser's ordinary cache, where the Cloudflare headers keep it for a year: the editors by opening a blank file
   // out of sight, the listed files by fetching them.
-  function warm() {
+  function warm(fresh) {
     if (running) return;
     running = true;
     all.disabled = true;
@@ -300,7 +300,7 @@
       function next() {
         var url = queue.shift();
         if (!url) return Promise.resolve();
-        return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        return fetch(url, fresh ? { cache: 'reload' } : {}).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
           .catch(function () { failed++; })
           .then(function () { done += urls[url]; warn.textContent = t('warming') + mb(done) + t('ofs') + mb(total); return next(); });
       }
@@ -337,13 +337,21 @@
   dialog.querySelector('[data-offline-close]').addEventListener('click', close);
   dialog.addEventListener('click', function (event) { if (event.target === dialog) close(); });
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !dialog.hidden) close(); });
-  all.addEventListener('click', function () { if (keeps) download(items); else warm(); });
+  all.addEventListener('click', function () { if (keeps) download(items); else warm(false); });
   // Check for updates: the browser keeps this site's program files for a long time (Cloudflare cache headers, see
-  // scripts/cloudflare_prepare.py). The offline copies are asked to update, then update.html, served with
-  // Clear-Site-Data: "cache", drops the browser's copy of the files (not saved data nor offline copies) and comes
-  // back here, so the next open loads the current version.
-  dialog.querySelector('[data-offline-update]').addEventListener('click', function () {
-    if (!confirm(t('serviceWorker' in navigator && window.caches ? 'updKeep' : 'updLoad'))) return;
+  // scripts/cloudflare_prepare.py). The offline copies are asked to update, then update.html (never cached) fetches
+  // this page and its scripts again past the cache and comes back here (?warm=1: without a service worker, every tool
+  // is fetched again too).
+  // Asked in the panel, not with confirm(): web views such as XeOS may not show browser dialogs. First tap shows the
+  // warning, second tap updates.
+  var updateButton = dialog.querySelector('[data-offline-update]'), armed = false;
+  updateButton.addEventListener('click', function () {
+    if (!armed) {
+      armed = true;
+      warn.textContent = t(keeps ? 'updKeep' : 'updLoad') + ' ' + t('tapAgain');
+      warn.hidden = false;
+      return;
+    }
     var updates = navigator.serviceWorker && navigator.serviceWorker.getRegistrations
       ? navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.update().catch(function () {}); })); })
       : Promise.resolve();
@@ -351,7 +359,7 @@
   });
   if (/[?&]warm=1/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
-    if (!keeps) { open(); warm(); }
+    if (!keeps) { open(); warm(true); }
   }
   window.InkDOSOfflineTools = Object.freeze({ open: open, status: function () { return Promise.all(items.map(function (i) { return statusOf(i).then(function (s) { return { id: i.id, done: s.done, part: s.part }; }); })); } });
 })();
