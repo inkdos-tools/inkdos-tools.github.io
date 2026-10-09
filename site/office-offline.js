@@ -85,7 +85,8 @@
         var missing = info.files.filter(function (f) { return !have.has(f.url); });
         var total = info.files.reduce(function (s, f) { return s + f.size; }, 0);
         var left = missing.reduce(function (s, f) { return s + f.size; }, 0);
-        return { done: !missing.length, part: missing.length < info.files.length, total: total, left: left, info: info, missing: missing };
+        return { done: !missing.length, part: missing.length < info.files.length, total: total, left: left, info: info, missing: missing,
+          empty: !info.files.length }; // a tool this address does not serve (the LibreOffice converter on Cloudflare)
       });
     });
   }
@@ -236,6 +237,7 @@
   function refresh() {
     items.forEach(function (item) {
       statusOf(item).then(function (s) {
+        if (rows[item.id]) rows[item.id].hidden = !!s.empty;
         var size = s.total ? ' · ' + mb(s.done ? s.total : s.left) : '';
         if (s.done) show(item, t('stored') + (s.total ? ' · ' + mb(s.total) : ''), 'done', t('again'));
         else show(item, (s.part ? t('part') : t('none')) + size, s.part ? 'part' : 'none');
