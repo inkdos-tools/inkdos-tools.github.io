@@ -17,12 +17,12 @@
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
       pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)', python: 'Python terminal and packages', epub: 'EPUB reader (foliate-js)', txt: 'Plain text editor (CodeMirror)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
-      get: 'Download', again: 'Update', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
+      get: 'Download', again: 'Update', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
       pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)', python: 'Terminal Python e pacotes', epub: 'Leitor de EPUB (foliate-js)', txt: 'Editor de texto (CodeMirror)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
-      get: 'Baixar', again: 'Atualizar', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
+      get: 'Baixar', again: 'Atualizar', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
       busy: 'Baixando', ofs: ' de ' }
   };
   var t = function (key) { var code = (root.lang || 'en').toLowerCase().split('-')[0]; return (T[code] || T.en)[key] || T.en[key]; };
@@ -179,9 +179,11 @@
     items.forEach(function (item) {
       var row = document.createElement('li');
       row.className = 'offline-row';
-      row.innerHTML = '<span class="offline-name"></span><span class="offline-state"></span><button type="button" class="office-action"></button>';
+      row.innerHTML = '<span class="offline-name"></span><span class="offline-state"></span><span class="offline-actions">'
+        + '<button type="button" class="office-action" data-remove hidden></button><button type="button" class="office-action" data-get></button></span>';
       row.querySelector('.offline-name').textContent = t(item.id);
-      row.querySelector('button').addEventListener('click', function () { download([item]); });
+      row.querySelector('[data-get]').addEventListener('click', function () { download([item]); });
+      row.querySelector('[data-remove]').addEventListener('click', function () { removeItem(item); });
       list.appendChild(row);
       rows[item.id] = row;
     });
@@ -191,9 +193,45 @@
     if (!row) return;
     row.dataset.state = state;
     row.querySelector('.offline-state').textContent = text;
-    var button = row.querySelector('button');
+    var button = row.querySelector('[data-get]'), drop = row.querySelector('[data-remove]');
     button.textContent = label || t('get');
     button.disabled = running || state === 'working';
+    drop.textContent = t('remove');
+    drop.hidden = !(state === 'done' || state === 'part');
+    drop.disabled = running;
+  }
+  // Remove one tool from this device: the stored files of that tool only (the editors share some common files,
+  // which stay while another editor is stored), so the others keep working offline.
+  function removeItem(item) {
+    if (running) return;
+    running = true;
+    show(item, t('removing'), 'working');
+    var job;
+    if (item.kind === 'editor') {
+      job = caches.keys().then(function (names) {
+        return Promise.all(names.filter(function (n) { return n.indexOf('document-editor-runtime-') === 0; }).map(function (n) {
+          return caches.open(n).then(function (cache) {
+            return cache.keys().then(function (keys) {
+              return Promise.all(keys.filter(function (r) {
+                var path = new URL(r.url).pathname;
+                return item.editor.marks.some(function (mark) { return path.indexOf(mark) === 0; });
+              }).map(function (r) { return cache.delete(r); }));
+            });
+          });
+        }));
+      });
+    } else {
+      job = filesOf(item).then(function (info) {
+        var drop = new Set(info.files.map(function (f) { return f.url; }));
+        return caches.open(info.data.cache).then(function (cache) {
+          return cache.keys().then(function (keys) {
+            return Promise.all(keys.filter(function (r) { var u = new URL(r.url); return drop.has(u.origin + u.pathname); })
+              .map(function (r) { return cache.delete(r); }));
+          });
+        });
+      });
+    }
+    job.catch(function () {}).then(function () { running = false; refresh(); });
   }
   function refresh() {
     items.forEach(function (item) {
