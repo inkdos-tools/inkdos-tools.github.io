@@ -2,6 +2,17 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-09 · Engine only: no Home, no copies of the InkDOS apps
+
+- Owner decision: everything goes through the main InkDOS repository and site. This site is now only the engine
+  InkDOS calls (ONLYOFFICE editors, BentoPDF, and the Offline tools panel framed by the InkDOS Home).
+- Its Home sends visitors to https://vfydr2m9wk-ops.github.io/InkDOS/ unless framed (`?embed=1`); the workspace
+  cards are gone.
+- The InkDOS apps are no longer copied here (`office.json` keeps only `shared/`, `assets/home.css`,
+  `assets/icons/` for the panel's look); the Offline tools panel no longer lists them.
+- No longer an entry point for files: `office-launch.js` and the web app manifest are removed.
+- Cloudflare stays paused and isolated (see below).
+
 ## 2026-10-09 · Offline tools from the InkDOS Home
 
 - `?offline=1` opens the Offline tools panel. With `&embed=1` (the InkDOS Home's download button frames it) only the

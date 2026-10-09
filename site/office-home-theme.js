@@ -2,6 +2,12 @@
 // matching editor theme; InkDOS passes ?inkdos-theme= and ?lang= when it links here.
 (function () {
   'use strict';
+  // This site is only the engine InkDOS calls (ONLYOFFICE, BentoPDF, the Offline tools panel framed by the InkDOS
+  // Home with ?embed=1). Opened on its own, its Home sends the visitor to InkDOS.
+  if (!/[?&]embed=1/.test(location.search) && /^\/(index\.html)?$/.test(location.pathname)) {
+    location.replace('https://vfydr2m9wk-ops.github.io/InkDOS/');
+    return;
+  }
   var root = document.documentElement, params = new URLSearchParams(location.search), mode = 'system';
   function store(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
   try { mode = localStorage.getItem('inkdos2:appearance') || 'system'; } catch (_) {}

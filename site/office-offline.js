@@ -36,7 +36,6 @@
     { id: 'slide', ext: 'pptx', marks: ['/sdkjs/slide/', '/web-apps/apps/presentationeditor/'] }
   ];
   var LISTS = [
-    { id: 'apps', list: '/inkdos-apps.json' },
     { id: 'pdf', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'pdf' },
     { id: 'office', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'office' }
   ];
