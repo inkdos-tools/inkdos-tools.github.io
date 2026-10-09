@@ -2,6 +2,11 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-09 · No cache-time promise
+
+- The Offline tools panel no longer says the tools stay cached "for up to a year": it says the browser or the system
+  can clear that cache at any time. README: the Cloudflare mirror is noted as paused, without cache durations.
+
 ## 2026-10-09 · Redirect loop with an old cached InkDOS
 
 - The Home's redirect goes to `https://vfydr2m9wk-ops.github.io/InkDOS/?engine=light`: an older InkDOS Home still
