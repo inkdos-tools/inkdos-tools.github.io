@@ -2,7 +2,7 @@
 // already stored, and "Download all". Every tool here is on this origin, so this page can read and fill their caches:
 // - Documents, Spreadsheets, Presentations (ONLYOFFICE): the editor's own worker (/sw.js) stores each editor the
 //   first time it runs; downloading runs it once, unseen, on a blank file (embed mode: nothing goes to Recent files).
-// - PDF tools, Office to PDF converters, Python terminal (InkDOS-tools): each folder lists its files in
+// - PDF tools, Office to PDF converters, EPUB reader, text editor (InkDOS-tools): each folder lists its files in
 //   inkdos-offline.json (worker, cache, files); downloading registers that worker and stores the missing files.
 (function () {
   'use strict';
@@ -36,7 +36,6 @@
   var LISTS = [
     { id: 'pdf', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'pdf' },
     { id: 'office', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'office' },
-    { id: 'python', list: '/InkDOS-tools/python/inkdos-offline.json' },
     { id: 'epub', list: '/InkDOS-tools/epub/inkdos-offline.json' },
     { id: 'txt', list: '/InkDOS-tools/txt/inkdos-offline.json' }
   ];
