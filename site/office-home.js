@@ -75,7 +75,7 @@
       engineNote: 'Editores ONLYOFFICE para Word, Excel e PowerPoint. Versão light: os editores do InkDOS, mais leves.',
       pdfTools: 'Ferramentas de PDF', terminal: 'Terminal', offline: 'Ferramentas offline', offlineTitle: 'Ferramentas neste aparelho',
       offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
-      close: 'Fechar', downloadAll: 'Baixar tudo',
+      close: 'Fechar', downloadAll: 'Baixar tudo', checkUpdates: 'Buscar atualizações',
       pdfCard: 'Ler, anotar, assinar e preencher PDFs (visualizador PDF.js).',
       txtCard: 'Criar e editar texto, Markdown, JSON e YAML (CodeMirror).',
       epubCard: 'Ler livros EPUB, MOBI, FB2 e CBZ (foliate-js).' },

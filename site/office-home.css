@@ -38,3 +38,4 @@ html[data-theme="dark"] .offline-row[data-state=done] .offline-state{color:#4ade
 .offline-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
 .offline-foot small{color:var(--muted);font-size:12px}
 .offline-row[hidden]{display:none}
+.offline-foot .offline-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
