@@ -37,3 +37,5 @@ html[data-theme="dark"] .offline-row[data-state=done] .offline-state{color:#4ade
 .offline-foot .offline-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .offline-list[hidden],.offline-foot [hidden]{display:none}
 .home-actions{display:inline-flex;align-items:center;gap:8px}
+/* embedded by the InkDOS Home: only the Offline tools panel, over the Home behind it */
+html.offline-embed,html.offline-embed body{background:transparent!important}html.offline-embed .home-shell{display:none!important}html.offline-embed .offline-overlay{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
