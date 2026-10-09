@@ -7,8 +7,10 @@ file, so the files that never change in place are kept by the browser for long.
 - Cloudflare Pages refuses files over 25 MiB (ONLYOFFICE's x2t.wasm, the LibreOffice converter of the PDF toolkit):
   they are left out of the upload and served at the same address by a Pages Function that fetches them from
   GitHub Pages (functions/[[path]].js, run only for those paths through _routes.json), with the same long cache.
-- _headers: hashed build files for a year (immutable); the vendored editor and tool files for a week, refreshed in
-  the background for a month after that; pages keep Cloudflare's default (always rechecked), so updates arrive."""
+- _headers: every file, pages included, is kept by the browser for a year (the longest a browser keeps a copy), so
+  a web view without service workers opens what it already loaded without the internet. New versions arrive through
+  Check for updates (Offline tools panel), which goes through update.html: never cached, it tells the browser to
+  drop its copy of the site's files."""
 from __future__ import annotations
 
 import json
@@ -16,32 +18,15 @@ import sys
 from pathlib import Path
 
 LIMIT = 25 * 1024 * 1024
-LONG = 'public, max-age=31536000, immutable'
-WEEK = 'public, max-age=604800, stale-while-revalidate=2592000'
-HEADERS = {
-    '/assets/*': LONG,
-    '/InkDOS-tools/bentopdf/assets/*': LONG,
-    '/sdkjs/*': WEEK,
-    '/web-apps/*': WEEK,
-    '/fonts/*': WEEK,
-    '/ran-fonts/*': WEEK,
-    '/InkDOS-tools/bentopdf/wasm/*': WEEK,
-    '/InkDOS-tools/bentopdf/pdfjs-viewer/*': WEEK,
-    '/InkDOS-tools/bentopdf/pdfjs-annotation-viewer/*': WEEK,
-    '/InkDOS-tools/bentopdf/embedpdf/*': WEEK,
-    '/InkDOS-tools/bentopdf/ocr/*': WEEK,
-    '/InkDOS-tools/epub/*': WEEK,
-    '/InkDOS-tools/txt/cm/*': WEEK,
-    '/InkDOS-tools/pnk/*': WEEK,
-}
+YEAR = 'public, max-age=31536000'
 
 
 FUNCTION = """// Files over the Cloudflare Pages size limit, served from GitHub Pages at this same address (scripts/cloudflare_prepare.py)
 export async function onRequest({ request }) {
   const url = new URL(request.url);
-  const upstream = await fetch('https://inkdos-tools.github.io' + url.pathname, { cf: { cacheEverything: true, cacheTtl: 604800 } });
+  const upstream = await fetch('https://inkdos-tools.github.io' + url.pathname, { cf: { cacheEverything: true, cacheTtl: 31536000 } });
   const headers = new Headers(upstream.headers);
-  headers.set('Cache-Control', '""" + WEEK + """');
+  headers.set('Cache-Control', '""" + YEAR + """');
   return new Response(upstream.body, { status: upstream.status, headers });
 }
 """
@@ -59,10 +44,10 @@ def main(site: Path, functions: Path) -> None:
         functions.mkdir(parents=True, exist_ok=True)
         (functions / '[[path]].js').write_text(FUNCTION, encoding='utf-8')
         (site / '_routes.json').write_text(json.dumps({'version': 1, 'include': proxied, 'exclude': []}), encoding='utf-8')
-    (site / '_headers').write_text(''.join(f'{route}\n  Cache-Control: {value}\n' for route, value in HEADERS.items())
+    (site / '_headers').write_text(f'/*\n  Cache-Control: {YEAR}\n'
                                    # Check for updates (Offline tools panel) goes through this page: the browser drops its
                                    # copy of the site's files (not saved data, not the offline copies) and returns
-                                   + '/update.html\n  Clear-Site-Data: "cache"\n  Cache-Control: no-store\n',
+                                   + '/update.html\n  ! Cache-Control\n  Cache-Control: no-store\n  Clear-Site-Data: "cache"\n',
                                    encoding='utf-8')
     count = sum(1 for p in site.rglob('*') if p.is_file())
     print(f'{count} files for Cloudflare Pages')
