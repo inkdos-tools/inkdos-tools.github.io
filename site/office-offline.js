@@ -17,12 +17,12 @@
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
       apps: 'PDF, Plain Text and EPUB apps (InkDOS)', pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
-      get: 'Download', again: 'Update', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
+      get: 'Download', again: 'Update', updKeep: 'Look for a new version now? The tools you downloaded stay on this device; only what changed is fetched.', updLoad: 'This browser cannot keep tools offline, so they live in its ordinary cache. After this, the editors download again the next time you open them (about 100 MB). Updates also arrive on their own within a week. Look for a new version now?', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
       apps: 'Apps de PDF, Texto e EPUB (InkDOS)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
-      get: 'Baixar', again: 'Atualizar', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
+      get: 'Baixar', again: 'Atualizar', updKeep: 'Buscar a versão mais nova agora? As ferramentas baixadas continuam neste aparelho; só o que mudou é baixado.', updLoad: 'Este navegador não guarda as ferramentas offline, então elas ficam no cache comum dele. Depois disto, os editores serão baixados de novo na próxima abertura (cerca de 100 MB). As atualizações também chegam sozinhas em até uma semana. Buscar a versão mais nova agora?', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
       busy: 'Baixando', ofs: ' de ' }
   };
   var t = function (key) { var code = (root.lang || 'en').toLowerCase().split('-')[0]; return (T[code] || T.en)[key] || T.en[key]; };
@@ -302,6 +302,7 @@
   // Clear-Site-Data: "cache", drops the browser's copy of the files (not saved data nor offline copies) and comes
   // back here, so the next open loads the current version.
   dialog.querySelector('[data-offline-update]').addEventListener('click', function () {
+    if (!confirm(t('serviceWorker' in navigator && window.caches ? 'updKeep' : 'updLoad'))) return;
     var updates = navigator.serviceWorker && navigator.serviceWorker.getRegistrations
       ? navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.update().catch(function () {}); })); })
       : Promise.resolve();
