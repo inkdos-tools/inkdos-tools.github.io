@@ -44,6 +44,17 @@ It lives at the root of the origin because the upstream build uses root-absolute
 - `source`: this build script and the workflow (`.github/workflows/pages.yml`).
 - `main`: the built site, replaced by every deploy; GitHub Pages serves it.
 
+## Cloudflare Pages
+
+The same site is also published at https://inkdos-offic.pages.dev, together with the InkDOS-tools pages it uses, so it
+all stays on one address. That address is the main one. GitHub Pages makes browsers recheck every file after 10
+minutes, which made each open slow in web views without service workers that keep their sessions (XeOS on iPad).
+Cloudflare Pages takes cache headers (`scripts/cloudflare_prepare.py`): build files are kept for a year, and editor and
+tool files for a week, refreshed in the background. **Check for updates** in the Offline tools panel goes through
+`update.html` (`Clear-Site-Data: "cache"`) to load a new version at once. Files over the 25 MiB Pages limit are served
+from GitHub Pages by a Pages Function at the same address. The workflow needs the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` secrets.
+
 ## Licences
 
 This repository (build script, patches to the editor, workflow, `site/`) is AGPL-3.0, the licence of the editor it builds (`LICENSE`). The InkDOS workspaces it copies in stay MIT (`INKDOS-LICENSE.txt`). ranuts/document is AGPL-3.0 (`UPSTREAM-LICENSE.txt` and

@@ -59,7 +59,10 @@ def main(site: Path, functions: Path) -> None:
         functions.mkdir(parents=True, exist_ok=True)
         (functions / '[[path]].js').write_text(FUNCTION, encoding='utf-8')
         (site / '_routes.json').write_text(json.dumps({'version': 1, 'include': proxied, 'exclude': []}), encoding='utf-8')
-    (site / '_headers').write_text(''.join(f'{route}\n  Cache-Control: {value}\n' for route, value in HEADERS.items()),
+    (site / '_headers').write_text(''.join(f'{route}\n  Cache-Control: {value}\n' for route, value in HEADERS.items())
+                                   # Check for updates (Offline tools panel) goes through this page: the browser drops its
+                                   # copy of the site's files (not saved data, not the offline copies) and returns
+                                   + '/update.html\n  Clear-Site-Data: "cache"\n  Cache-Control: no-store\n',
                                    encoding='utf-8')
     count = sum(1 for p in site.rglob('*') if p.is_file())
     print(f'{count} files for Cloudflare Pages')

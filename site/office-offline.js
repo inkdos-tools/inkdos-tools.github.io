@@ -297,5 +297,15 @@
   dialog.addEventListener('click', function (event) { if (event.target === dialog) close(); });
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !dialog.hidden) close(); });
   all.addEventListener('click', function () { download(items); });
+  // Check for updates: the browser keeps this site's program files for a long time (Cloudflare cache headers, see
+  // scripts/cloudflare_prepare.py). The offline copies are asked to update, then update.html, served with
+  // Clear-Site-Data: "cache", drops the browser's copy of the files (not saved data nor offline copies) and comes
+  // back here, so the next open loads the current version.
+  dialog.querySelector('[data-offline-update]').addEventListener('click', function () {
+    var updates = navigator.serviceWorker && navigator.serviceWorker.getRegistrations
+      ? navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.update().catch(function () {}); })); })
+      : Promise.resolve();
+    updates.catch(function () {}).then(function () { location.href = './update.html'; });
+  });
   window.InkDOSOfflineTools = Object.freeze({ open: open, status: function () { return Promise.all(items.map(function (i) { return statusOf(i).then(function (s) { return { id: i.id, done: s.done, part: s.part }; }); })); } });
 })();
