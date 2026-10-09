@@ -19,7 +19,6 @@
   Promise.all([again('./'), again('./index.html')]).then(function (pages) {
     var html = pages[0] || pages[1] || '', urls = [];
     html.replace(/(?:src|href)="(\.?\/[^"#]+)"/g, function (_, u) { if (!/^\/\//.test(u)) urls.push(new URL(u, location.href).href); return _; });
-    urls.push(new URL('/inkdos-apps.json', location.href).href);
     return Promise.all(urls.map(again));
   }).then(back, back);
 })();

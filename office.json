@@ -11,13 +11,6 @@
     "repo": "https://github.com/vfydr2m9wk-ops/InkDOS",
     "ref": "c83042d82a18bb69c65f06822e29f1f4ec521763",
     "paths": [
-      "apps/presentations",
-      "apps/spreadsheets",
-      "apps/documents",
-      "apps/pdf",
-      "apps/txt",
-      "apps/epub",
-      "labs/pdf",
       "shared",
       "assets/home.css",
       "assets/icons"
