@@ -15,12 +15,12 @@
 
   var T = {
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
-      pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
+      apps: 'PDF, Plain Text and EPUB apps (InkDOS)', pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
       get: 'Download', again: 'Update', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
-      pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
+      apps: 'Apps de PDF, Texto e EPUB (InkDOS)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
       get: 'Baixar', again: 'Atualizar', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
       busy: 'Baixando', ofs: ' de ' }
@@ -34,6 +34,7 @@
     { id: 'slide', ext: 'pptx', marks: ['/sdkjs/slide/', '/web-apps/apps/presentationeditor/'] }
   ];
   var LISTS = [
+    { id: 'apps', list: '/inkdos-apps.json' },
     { id: 'pdf', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'pdf' },
     { id: 'office', list: '/InkDOS-tools/bentopdf/inkdos-offline.json', group: 'office' }
   ];
@@ -79,7 +80,7 @@
   function listStatus(item) {
     return filesOf(item).then(function (info) {
       return caches.open(info.data.cache).then(function (cache) { return cache.keys(); }).then(function (keys) {
-        var have = new Set(keys.map(function (r) { var u = new URL(r.url); return u.origin + u.pathname; }));
+        var have = new Set(keys.map(function (r) { return new URL(r.url).href; }));
         var missing = info.files.filter(function (f) { return !have.has(f.url); });
         var total = info.files.reduce(function (s, f) { return s + f.size; }, 0);
         var left = missing.reduce(function (s, f) { return s + f.size; }, 0);
@@ -153,7 +154,8 @@
   // then whatever is still missing, a few files at a time
   function fillList(item, progress) {
     return listStatus(item).then(function (first) {
-      return activeWorker(first.info.data).then(function () { return listStatus(item); });
+      // the InkDOS apps have no worker of their own: the editor's worker serves them from their cache
+      return (first.info.data.worker ? activeWorker(first.info.data) : editorWorker()).then(function () { return listStatus(item); });
     }).then(function (state) {
       var queue = state.missing.slice(), done = state.total - state.left, failed = 0;
       progress(done, state.total);
@@ -221,10 +223,10 @@
       });
     } else {
       job = filesOf(item).then(function (info) {
-        var drop = new Set(info.files.map(function (f) { return f.url; }));
+        var drop = new Set(info.files.map(function (f) { return new URL(f.url).href; }));
         return caches.open(info.data.cache).then(function (cache) {
           return cache.keys().then(function (keys) {
-            return Promise.all(keys.filter(function (r) { var u = new URL(r.url); return drop.has(u.origin + u.pathname); })
+            return Promise.all(keys.filter(function (r) { return drop.has(new URL(r.url).href); })
               .map(function (r) { return cache.delete(r); }));
           });
         });

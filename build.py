@@ -10,6 +10,7 @@ different one from InkDOS. Changes to the upstream build, all in its output, are
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -55,6 +56,27 @@ def patch(file: Path, edits: list[tuple[str, str]]) -> None:
             sys.exit(f'{file}: expected exactly one occurrence of {old!r}')
         text = text.replace(old, new)
     file.write_text(text, encoding='utf-8')
+
+
+# The InkDOS PDF, Plain Text and EPUB apps copied here, for Download all on the Home (site/office-offline.js): their
+# files go into a cache of their own, which the editor's worker answers from (it looks in every cache). The Home opens
+# them with ?suite=1&inkdos-theme=light|dark, so the pages are listed with those addresses too.
+INKDOS_OFFLINE_PATHS = ('apps/pdf', 'apps/txt', 'apps/epub', 'shared', 'assets/home.css', 'assets/icons')
+
+
+def offline_inkdos_apps(out: Path) -> None:
+    files = []
+    for rel in INKDOS_OFFLINE_PATHS:
+        base = out / rel
+        for path in sorted([base] if base.is_file() else base.rglob('*')):
+            if path.is_file():
+                files.append({'url': '/' + path.relative_to(out).as_posix(), 'size': path.stat().st_size})
+    for app in ('pdf', 'txt', 'epub'):
+        for theme in ('light', 'dark'):
+            files.append({'url': f'/apps/{app}/index.html?suite=1&inkdos-theme={theme}', 'size': 0})
+    stamp = hashlib.sha256(json.dumps(files).encode()).hexdigest()[:12]
+    (out / 'inkdos-apps.json').write_text(json.dumps({'cache': 'inkdos-apps-' + stamp, 'files': files},
+                                                     separators=(',', ':')), encoding='utf-8')
 
 
 def apply_patches(out: Path) -> None:
@@ -177,6 +199,7 @@ def main() -> None:
     for item in (ROOT / 'site').iterdir():
         shutil.copy2(item, out / item.name)
     apply_patches(out)
+    offline_inkdos_apps(out)
     shutil.copy2(src / TOOL['license_file'], out / 'UPSTREAM-LICENSE.txt')
     (out / 'UPSTREAM-SOURCE.txt').write_text(
         f"{TOOL['name']}\n{TOOL['repo']}\ncommit {TOOL['ref']}\nlicense {TOOL['license']}\n"
