@@ -17,12 +17,14 @@
     en: { word: 'Documents editor (Word)', cell: 'Spreadsheets editor (Excel)', slide: 'Presentations editor (PowerPoint)',
       apps: 'PDF, Plain Text and EPUB apps (InkDOS)', pdf: 'PDF tools (edit, split, merge, OCR…)', office: 'Office and ODF to PDF converters (LibreOffice)',
       stored: 'On this device', none: 'Not downloaded', part: 'Partly downloaded', working: 'Downloading…', failed: 'Could not download; try again online',
-      get: 'Download', again: 'Update', updKeep: 'Look for a new version now? The tools you downloaded stay on this device; only what changed is fetched.', updLoad: 'This browser cannot keep tools offline, so they live in its ordinary cache. After this, the editors download again the next time you open them (about 100 MB). Updates also arrive on their own within a week. Look for a new version now?', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker), so they always load from the internet here.',
+      get: 'Download', again: 'Update', updKeep: 'Look for a new version now? The tools you downloaded stay on this device; only what changed is fetched.', updLoad: 'This browser cannot keep tools offline, so they live in its ordinary cache. This clears that cache and downloads every tool again into it (a few hundred MB; keep this page open). Look for a new version now?', remove: 'Remove', removing: 'Removing…', used: 'Used on this device: ', nosw: 'This browser cannot keep tools offline (no service worker). Download all puts every tool in its ordinary cache for up to a year, so they open from this device; the system can still clear that cache when space runs low.',
+      warming: 'Saving to the cache: ', warmed: 'Done: the tools are in this browser\'s cache.', warmFail: ' files could not be saved; try again online.',
       busy: 'Downloading', ofs: ' of ' },
     pt: { word: 'Editor de Documentos (Word)', cell: 'Editor de Planilhas (Excel)', slide: 'Editor de Apresentações (PowerPoint)',
       apps: 'Apps de PDF, Texto e EPUB (InkDOS)', pdf: 'Ferramentas de PDF (editar, dividir, juntar, OCR…)', office: 'Conversores Office e ODF para PDF (LibreOffice)',
       stored: 'Neste aparelho', none: 'Não baixado', part: 'Baixado em parte', working: 'Baixando…', failed: 'Não foi possível baixar; tente de novo com internet',
-      get: 'Baixar', again: 'Atualizar', updKeep: 'Buscar a versão mais nova agora? As ferramentas baixadas continuam neste aparelho; só o que mudou é baixado.', updLoad: 'Este navegador não guarda as ferramentas offline, então elas ficam no cache comum dele. Depois disto, os editores serão baixados de novo na próxima abertura (cerca de 100 MB). As atualizações também chegam sozinhas em até uma semana. Buscar a versão mais nova agora?', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não consegue guardar as ferramentas offline (sem service worker); aqui elas sempre carregam da internet.',
+      get: 'Baixar', again: 'Atualizar', updKeep: 'Buscar a versão mais nova agora? As ferramentas baixadas continuam neste aparelho; só o que mudou é baixado.', updLoad: 'Este navegador não guarda as ferramentas offline, então elas ficam no cache comum dele. Isto limpa esse cache e baixa todas as ferramentas de novo para ele (algumas centenas de MB; mantenha esta página aberta). Buscar a versão mais nova agora?', remove: 'Remover', removing: 'Removendo…', used: 'Em uso neste aparelho: ', nosw: 'Este navegador não guarda as ferramentas offline (sem service worker). Baixar tudo coloca todas as ferramentas no cache comum dele por até 1 ano, para abrirem deste aparelho; o sistema ainda pode limpar esse cache se faltar espaço.',
+      warming: 'Guardando no cache: ', warmed: 'Pronto: as ferramentas estão no cache deste navegador.', warmFail: ' arquivos não foram guardados; tente de novo com internet.',
       busy: 'Baixando', ofs: ' de ' }
   };
   var t = function (key) { var code = (root.lang || 'en').toLowerCase().split('-')[0]; return (T[code] || T.en)[key] || T.en[key]; };
@@ -41,6 +43,7 @@
   var items = EDITORS.map(function (e) { return { id: e.id, kind: 'editor', editor: e }; })
     .concat(LISTS.map(function (l) { return { id: l.id, kind: 'list', source: l }; }));
   var running = false;
+  var keeps = 'serviceWorker' in navigator && !!window.caches;
 
   // ---- the lists of files (kept in a cache of their own, so the status still shows with no network) ----
   var LIST_CACHE = 'inkdos-offline-lists';
@@ -97,7 +100,7 @@
   }
   // the editor runs once in an unseen frame on a blank file; its worker stores everything it loads
   function runEditor(item) {
-    return editorWorker().then(function () {
+    return (keeps ? editorWorker() : Promise.resolve()).then(function () {
       return fetch('./offline-blank.' + item.editor.ext).then(function (r) { return r.blob(); });
     }).then(function (blob) {
       return new Promise(function (resolve, reject) {
@@ -123,6 +126,7 @@
         // "opened" can come before the editor has loaded all of itself: wait until its files are stored (or 2 minutes),
         // then a little longer for the last ones
         function settle(start) {
+          if (!keeps) { setTimeout(function () { finish(); }, 20000); return; }
           editorStatus(item).then(function (s) {
             if (s.done || Date.now() - start > 120000) setTimeout(function () { finish(); }, 3000);
             else setTimeout(function () { settle(start); }, 1000);
@@ -272,6 +276,42 @@
     });
   }
 
+  // No service worker (XeOS): Download all, and Check for updates on its way back (?warm=1), load every tool into the
+  // browser's ordinary cache, where the Cloudflare headers keep it for a year: the editors by opening a blank file
+  // out of sight, the listed files by fetching them.
+  function warm() {
+    if (running) return;
+    running = true;
+    all.disabled = true;
+    warn.textContent = t('warming') + '…';
+    var urls = {}, done = 0, total = 0, failed = 0;
+    var editors = EDITORS.reduce(function (chain, e) {
+      return chain.then(function () { return runEditor({ id: e.id, editor: e }).catch(function () { failed++; }); });
+    }, Promise.resolve());
+    var lists = Array.from(new Set(LISTS.map(function (l) { return l.list; })));
+    editors.then(function () {
+      return Promise.all(lists.map(function (url) {
+        return fetch(url, { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (data) {
+          data.files.forEach(function (f) { var u = new URL(f.url, location.origin).href; if (!urls[u]) { urls[u] = f.size || 0; total += f.size || 0; } });
+        }).catch(function () { failed++; });
+      }));
+    }).then(function () {
+      var queue = Object.keys(urls);
+      function next() {
+        var url = queue.shift();
+        if (!url) return Promise.resolve();
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+          .catch(function () { failed++; })
+          .then(function () { done += urls[url]; warn.textContent = t('warming') + mb(done) + t('ofs') + mb(total); return next(); });
+      }
+      return Promise.all([next(), next(), next(), next()]);
+    }).then(function () {
+      running = false;
+      all.disabled = false;
+      warn.textContent = failed ? failed + t('warmFail') : t('warmed');
+    });
+  }
+
   function open() {
     dialog.hidden = false;
     opener.setAttribute('aria-expanded', 'true');
@@ -279,10 +319,9 @@
     if (!('serviceWorker' in navigator) || !window.caches) {
       // this browser cannot keep tools (no service worker, e.g. XeOS): no list or Download all, only the notice and
       // Check for updates (which clears the browser's ordinary cache)
-      warn.textContent = t('nosw');
+      if (!running) warn.textContent = t('nosw');
       warn.hidden = false;
       list.hidden = true;
-      all.hidden = true;
       dialog.querySelector('[data-offline-close]').focus();
       return;
     }
@@ -298,7 +337,7 @@
   dialog.querySelector('[data-offline-close]').addEventListener('click', close);
   dialog.addEventListener('click', function (event) { if (event.target === dialog) close(); });
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !dialog.hidden) close(); });
-  all.addEventListener('click', function () { download(items); });
+  all.addEventListener('click', function () { if (keeps) download(items); else warm(); });
   // Check for updates: the browser keeps this site's program files for a long time (Cloudflare cache headers, see
   // scripts/cloudflare_prepare.py). The offline copies are asked to update, then update.html, served with
   // Clear-Site-Data: "cache", drops the browser's copy of the files (not saved data nor offline copies) and comes
@@ -310,5 +349,9 @@
       : Promise.resolve();
     updates.catch(function () {}).then(function () { location.href = './update.html'; });
   });
+  if (/[?&]warm=1/.test(location.search)) {
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
+    if (!keeps) { open(); warm(); }
+  }
   window.InkDOSOfflineTools = Object.freeze({ open: open, status: function () { return Promise.all(items.map(function (i) { return statusOf(i).then(function (s) { return { id: i.id, done: s.done, part: s.part }; }); })); } });
 })();
