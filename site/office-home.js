@@ -62,6 +62,12 @@
   picker.type = 'file'; picker.hidden = true; document.body.appendChild(picker);
   var pickFor = null;
   picker.addEventListener('change', function () { var file = picker.files && picker.files[0]; if (file && pickFor) handoff(file, pickFor); });
+  // New on a workspace card: hand the workspace an empty file, so its editor opens right away (no start page)
+  document.querySelectorAll('[data-launch-new]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      handoff(new File([''], button.dataset.newName || 'Untitled.txt', { type: 'text/plain' }), button.dataset.launchNew);
+    });
+  });
   document.querySelectorAll('[data-launch-app]').forEach(function (button) {
     button.addEventListener('click', function () {
       pickFor = button.dataset.launchApp; picker.accept = button.dataset.launchAccept || ''; picker.value = ''; picker.click();
