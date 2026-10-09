@@ -80,8 +80,6 @@
       presentations: 'Apresentações PowerPoint (PPTX, PPT, ODP) com o editor completo.', open: 'Abrir', new: 'Novo', edit: 'Editar',
       note: 'Documentos, Planilhas e Apresentações baixam cerca de 100 MB na primeira vez. Os arquivos nunca saem deste aparelho.',
       powered: 'Powered by', recent: 'Arquivos recentes', source: 'Código-fonte',
-      engine: 'Motor', light: 'Versão light', full: 'Versão completa',
-      engineNote: 'Editores ONLYOFFICE para Word, Excel e PowerPoint. Versão light: os editores do InkDOS, mais leves.',
       pdfTools: 'Ferramentas de PDF', terminal: 'Terminal', offline: 'Ferramentas offline', offlineTitle: 'Ferramentas neste aparelho',
       offlineIntro: 'Baixe as ferramentas uma vez e elas abrem sem internet. Os arquivos que você abre nunca saem deste aparelho.',
       close: 'Fechar', downloadAll: 'Baixar tudo', checkUpdates: 'Buscar atualizações',
