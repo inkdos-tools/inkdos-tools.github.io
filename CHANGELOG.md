@@ -2,6 +2,12 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-09 · ONLYOFFICE always classic light
+
+- The ONLYOFFICE editors always open in the classic light theme (coloured header), whatever the InkDOS theme or the
+  system's: the editor no longer follows the site theme, the OS dark mode or the flat white default (build.py patch of
+  upstream lib/onlyoffice/ui-theme.ts; office-home-theme.js keeps 'ran-theme' light).
+
 ## 2026-10-09 · No cache-time promise
 
 - The Offline tools panel no longer says the tools stay cached "for up to a year": it says the browser or the system

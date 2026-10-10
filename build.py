@@ -147,9 +147,13 @@ def main() -> None:
     work.mkdir(parents=True, exist_ok=True)
     src = fetch(work)
     pnpm = ['npx', '-y', f"pnpm@{TOOL['pnpm']}"]
-    # InkDOS look: the editor's light chrome is the flat white theme instead of the classic coloured header
+    # Owner (2026-10-09): the editor always opens in the classic light theme, never following the InkDOS theme or the
+    # system's (no dark editor, no flat white chrome)
     patch(src / 'lib' / 'onlyoffice' / 'ui-theme.ts', [
-        ("export const DEFAULT_UI_THEME = 'theme-classic-light';", "export const DEFAULT_UI_THEME = 'theme-white';"),
+        ("  return resolveEditorUiTheme(DEFAULT_UI_THEME);",
+         "  void resolveEditorUiTheme;\n  return DEFAULT_UI_THEME; // InkDOS: always classic light"),
+        ("  installEditorThemeFollow(DEFAULT_UI_THEME);",
+         "  void installEditorThemeFollow; // InkDOS: the editor does not follow the site or system theme"),
     ])
     # InkDOS keeps no list of recent files: the device's own file manager is where files are found again. The editor's
     # automatic snapshots into its local history are turned off for everyone (the setting is ignored).
