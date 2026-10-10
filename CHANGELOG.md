@@ -2,6 +2,13 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-10 · Editor as a separate page (InkDOS in XeOS)
+
+- Inside the XeOS web desktop an editor framed in InkDOS does not scroll, so InkDOS opens /editor as a page of its
+  own (?inkdos-handoff=<id>&inkdos-return=<InkDOS page>). site/inkdos-handoff.js (added to editor.html) fetches the
+  document through a hidden InkDOS page (handoff.html) and opens it with the editor's own embed protocol; a small
+  "← InkDOS" button and this site's root lead back to the InkDOS page. CSP frame-src allows the InkDOS origin.
+
 ## 2026-10-09 · ONLYOFFICE always classic light
 
 - The ONLYOFFICE editors always open in the classic light theme (coloured header), whatever the InkDOS theme or the

@@ -21,8 +21,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 TOOL = json.loads((ROOT / 'office.json').read_text(encoding='utf-8'))
 # no page of this site may reach another site (the editor's optional AI assistants call outside APIs)
-CSP = ("connect-src 'self' data: blob:; frame-src 'self' blob:; form-action 'none'; object-src 'none'; "
-       "base-uri 'self'")
+# frame-src also allows the InkDOS origin: the editor fetches a document InkDOS hands over as a separate page
+# through a hidden InkDOS page (site/inkdos-handoff.js)
+CSP = ("connect-src 'self' data: blob:; frame-src 'self' blob: https://vfydr2m9wk-ops.github.io; form-action 'none'; "
+       "object-src 'none'; base-uri 'self'")
 CSP_META = f'<meta http-equiv="Content-Security-Policy" content="{CSP}" data-inkdos-office>'
 
 
@@ -91,6 +93,14 @@ def apply_patches(out: Path) -> None:
             frames += 1
     if not frames:
         sys.exit('no editor frame page found for site/editor-inkdos.js')
+    # 0b. The editor host page receives a document InkDOS hands over as a separate page (XeOS; site/inkdos-handoff.js)
+    host = out / 'editor.html'
+    text = host.read_text(encoding='utf-8', errors='surrogateescape')
+    tag = '<script src="/inkdos-handoff.js"></script>'
+    if tag not in text:
+        if '</head>' not in text:
+            sys.exit('editor.html has no </head> for site/inkdos-handoff.js')
+        host.write_text(text.replace('</head>', tag + '</head>', 1), encoding='utf-8', errors='surrogateescape')
     # 1. The x2t converter is shipped brotli-compressed under x2t.wasm.br and needs the server to declare
     #    Content-Encoding: br, which GitHub Pages cannot send: ship it decompressed as x2t.wasm instead.
     br = out / 'sdkjs' / 'common' / 'wasm' / 'x2t' / 'x2t.wasm.br'

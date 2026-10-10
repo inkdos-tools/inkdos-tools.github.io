@@ -7,7 +7,10 @@
   if (!/[?&]embed=1/.test(location.search) && /^\/(index\.html)?$/.test(location.pathname)) {
     // ?engine=light: an older InkDOS Home still cached on a device (with the Light/Full switch) would otherwise send
     // the visitor straight back here; that parameter makes it stay, so its update can install.
-    location.replace('https://vfydr2m9wk-ops.github.io/InkDOS/?engine=light');
+    // back to the InkDOS page that handed a document over as a separate page (site/inkdos-handoff.js), else Home
+    var back = null;
+    try { back = sessionStorage.getItem('inkdos-return'); } catch (_) {}
+    location.replace(back && back.indexOf('https://vfydr2m9wk-ops.github.io/') === 0 ? back : 'https://vfydr2m9wk-ops.github.io/InkDOS/?engine=light');
     return;
   }
   var root = document.documentElement, params = new URLSearchParams(location.search), mode = 'system';
