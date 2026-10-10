@@ -1,0 +1,5 @@
+ranuts/document
+https://github.com/ranuts/document
+commit 9c743826d0152239dc7ad51677535d59679c7ff1
+license AGPL-3.0
+changes: see build.py on the source branch of https://github.com/inkdos-tools/inkdos-tools.github.io
