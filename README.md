@@ -32,8 +32,9 @@ It lives at the root of the origin because the upstream build uses root-absolute
    (`connect-src 'self' data: blob:`), so the optional AI assistants of the editor cannot send anything out.
 4. Cloudflare host files (`_headers`, `_redirects`) are left out.
 5. The Home is InkDOS Office's own (`site/`), in place of the upstream landing page, with "Powered by
-   ONLYOFFICE" at the bottom. The editor's light
-   theme is the flat white one (`theme-white`) instead of the classic coloured header.
+   ONLYOFFICE" at the bottom. The editor always uses the classic light theme.
+   A document InkDOS hands over opens the editor as a page of its own (`site/inkdos-handoff.js`; the browser's Back
+   returns to InkDOS), and the editor's "Install the App / Add to Dock" card is hidden.
 6. No recent files: the editor's local history is turned off (`lib/history/autosave.ts` always reports it
    disabled), the Home has no Recent files link and removes a history stored before, once per device. Files are
    found again with the device's own file manager. Should it ever be turned back on, its snapshots are encrypted at
