@@ -20,8 +20,8 @@
   root.dataset.theme = root.dataset.appearance = root.dataset.appearanceResolved = dark ? 'dark' : 'light';
   root.dataset.appearanceMode = mode;
   root.style.colorScheme = dark ? 'dark' : 'light';
-  // the OnlyOffice editors follow 'ran-theme' (light: flat white chrome, dark: dark chrome)
-  store('ran-theme', dark ? 'dark' : 'light');
+  // the ONLYOFFICE editors stay classic light whatever the InkDOS theme (owner, 2026-10-09)
+  store('ran-theme', 'light');
   var lang = params.get('lang');
   if (lang) store('inkdos2:language', lang);
 })();
