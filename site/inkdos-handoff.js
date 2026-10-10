@@ -6,6 +6,10 @@
 // embedOrigin = this site). The browser's Back, the editor's Home button and this site's root lead back to InkDOS.
 (function () {
   'use strict';
+  // no "Install the App / Add to Dock" card over the editor (owner, 2026-10-10): the editor's own pwa-install element
+  var hide = document.createElement('style');
+  hide.textContent = 'pwa-install{display:none!important}';
+  (document.head || document.documentElement).appendChild(hide);
   var INKDOS = 'https://vfydr2m9wk-ops.github.io';
   var q = new URLSearchParams(location.search), id = q.get('inkdos-handoff'), back = q.get('inkdos-return');
   if (back && back.indexOf(INKDOS + '/') === 0) { try { sessionStorage.setItem('inkdos-return', back); } catch (_) {} }
