@@ -2,6 +2,11 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-10 · Editor page without the InkDOS button
+
+- InkDOS (web) now always opens the editor as a page of its own; the "← InkDOS" button over it is gone, the
+  browser's Back returns to InkDOS (owner).
+
 ## 2026-10-10 · InkDOS on one address (Cloudflare)
 
 - The Cloudflare mirror is on again (owner): https://inkdos-offic.pages.dev serves this site at /, InkDOS at
