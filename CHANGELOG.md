@@ -2,6 +2,13 @@
 
 Changes to the InkDOS suite site (https://inkdos-tools.github.io), newest first.
 
+## 2026-10-10 · InkDOS on one address (Cloudflare)
+
+- The Cloudflare mirror is on again (owner): https://inkdos-offic.pages.dev serves this site at /, InkDOS at
+  /InkDOS/ and the InkDOS-tools pages at /InkDOS-tools/. In that copy the GitHub addresses are rewritten to the one
+  address (InkDOS's offline snapshot rebuilt), so InkDOS uses the editors and BentoPDF of the same address; the root
+  opens InkDOS.
+
 ## 2026-10-10 · Editor as a separate page (InkDOS in XeOS)
 
 - Inside the XeOS web desktop an editor framed in InkDOS does not scroll, so InkDOS opens /editor as a page of its

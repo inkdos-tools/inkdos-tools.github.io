@@ -22,7 +22,7 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_MIRROR: paused
+      CLOUDFLARE_MIRROR: 'on'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -41,17 +41,27 @@ jobs:
           publish_branch: main
           force_orphan: true  # one commit per deploy, so old builds do not pile up in history
           commit_message: Deploy full office suite (beta)
-      # Same site on Cloudflare Pages, together with the InkDOS-tools pages it uses (same address), so browsers
-      # can keep the files for long (scripts/cloudflare_prepare.py). Paused (owner request): the address keeps a
-      # notice page (cloudflare/paused/) until the suite is settled on GitHub Pages; set CLOUDFLARE_MIRROR to 'on'
-      # to publish the full site there again.
-      - name: Add the InkDOS-tools pages
+      # InkDOS on one address, Cloudflare Pages (owner, 2026-10-10): https://inkdos-offic.pages.dev serves this
+      # site at /, InkDOS (its main branch) at /InkDOS/ and the InkDOS-tools pages at /InkDOS-tools/, the same paths
+      # as on GitHub Pages. In that copy every link between them points to the one address (the GitHub addresses
+      # are rewritten), so InkDOS uses the editors and BentoPDF of the same address; InkDOS's offline snapshot is
+      # rebuilt for the rewritten files. Set CLOUDFLARE_MIRROR to 'paused' to publish the notice page instead.
+      - name: Add InkDOS and the InkDOS-tools pages
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_MIRROR == 'on'
         run: |
           git clone -q --depth 1 --branch gh-pages https://github.com/inkdos-tools/InkDOS-tools _tools
           rm -rf _tools/.git
           mkdir -p _site/InkDOS-tools
           cp -a _tools/. _site/InkDOS-tools/
+          git clone -q --depth 1 --branch main https://github.com/vfydr2m9wk-ops/InkDOS _inkdos
+          find _site _inkdos -type f \( -name '*.html' -o -name '*.js' -o -name '*.mjs' -o -name '*.json' -o -name '*.css' -o -name '*.webmanifest' \) \
+            -not -path '*/.git/*' -print0 | xargs -0 sed -i \
+            -e 's#https://inkdos-tools\.github\.io#https://inkdos-offic.pages.dev#g' \
+            -e 's#https://vfydr2m9wk-ops\.github\.io#https://inkdos-offic.pages.dev#g' \
+            -e 's#vfydr2m9wk-ops\\\.github\\\.io#inkdos-offic\\.pages\\.dev#g'
+          (cd _inkdos && python scripts/build_offline_snapshot.py)
+          mkdir -p _site/InkDOS
+          (cd _inkdos && cp -a index.html handoff.html service-worker.js manifest.webmanifest VERSION.json assets apps shared ../_site/InkDOS/)
           python scripts/cloudflare_prepare.py _site functions
       - name: Deploy to Cloudflare Pages
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_MIRROR == 'on'
