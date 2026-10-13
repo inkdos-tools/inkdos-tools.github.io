@@ -14,7 +14,10 @@
   var q = new URLSearchParams(location.search), id = q.get('inkdos-handoff'), back = q.get('inkdos-return');
   if (back && back.indexOf(INKDOS + '/') === 0) { try { sessionStorage.setItem('inkdos-return', back); } catch (_) {} }
   // no InkDOS button over the editor (owner, 2026-10-10): the browser's Back returns to the InkDOS page
-  if (!id || !/^[A-Za-z0-9-]{8,64}$/.test(id)) return;
+  // InkDOS opened this page as a new tab (inkdos-opener=1): it sends the document to this tab by postMessage once
+  // asked (Safari keeps the IndexedDB of a cross-site frame apart, so the hidden handoff.html sees nothing there)
+  var opener = q.get('inkdos-opener') === '1' ? window.opener : null;
+  if (!opener && (!id || !/^[A-Za-z0-9-]{8,64}$/.test(id))) return;
   // the editor talks to window.parent (embed protocol); inside the XeOS window that would be XeOS: here the editor is
   // the top of its own conversation, so its replies come back to this page (window.parent is replaceable)
   try { Object.defineProperty(window, 'parent', { value: window, configurable: true }); } catch (_) {}
@@ -27,10 +30,11 @@
   addEventListener('message', function (event) {
     var data = event.data || {};
     if (event.origin === location.origin && event.source === window && data.type === 'document:ready') { ready = true; send(); return; }
-    if (event.origin !== INKDOS || !frame || event.source !== frame.contentWindow) return;
+    if (event.origin !== INKDOS || file) return;
+    if (!(opener && event.source === opener) && !(frame && event.source === frame.contentWindow)) return;
     if (data.type !== 'inkdos-handoff-file' || !(data.file instanceof Blob)) return;
     file = data.file instanceof File ? data.file : new File([data.file], String(data.name || 'document'), { type: data.file.type });
-    frame.remove(); frame = null;
+    if (frame) { frame.remove(); frame = null; }
     send();
   });
   function fetchFile() {
@@ -39,5 +43,6 @@
     frame.src = INKDOS + '/InkDOS/handoff.html?id=' + encodeURIComponent(id);
     document.body.appendChild(frame);
   }
+  if (opener) { opener.postMessage({ type: 'inkdos-opener-ready' }, INKDOS); return; }
   if (document.body) fetchFile(); else document.addEventListener('DOMContentLoaded', fetchFile, { once: true });
 })();
